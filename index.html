@@ -16,6 +16,11 @@
       --muted: #9fbad2;
       --accent: #ffb054;
       --accent-2: #6cf0c2;
+      --rarity-common: rgba(255, 255, 255, 0.06);
+      --rarity-uncommon: rgba(110, 225, 255, 0.12);
+      --rarity-rare: rgba(170, 140, 255, 0.14);
+      --rarity-legendary: rgba(255, 200, 120, 0.18);
+      --rarity-mythic: rgba(255, 110, 110, 0.2);
       --danger: #f16f6f;
       --ok: #7ee0ff;
       --border: rgba(255, 255, 255, 0.18);
@@ -51,7 +56,6 @@
       border-radius: 14px;
       padding: 18px 20px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(6px);
     }
 
     h1 {
@@ -63,6 +67,8 @@
     }
 
     .cta-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-row.nowrap { flex-wrap: nowrap; }
+    .cta-row.nowrap button { flex: 1; }
 
     button {
       border: 1px solid var(--border);
@@ -114,6 +120,9 @@
       font-size: 14px;
     }
 
+    .stats.nowrap { flex-wrap: nowrap; }
+    .stats.nowrap .stat-pill { flex: 1; text-align: center; }
+
     .stat-pill {
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid var(--border);
@@ -159,6 +168,18 @@
       font-size: 12px;
     }
 
+    .face-chip.rarity-common { background: var(--rarity-common); }
+    .face-chip.rarity-uncommon { background: var(--rarity-uncommon); }
+    .face-chip.rarity-rare { background: var(--rarity-rare); }
+    .face-chip.rarity-legendary { background: var(--rarity-legendary); }
+    .face-chip.rarity-mythic { background: var(--rarity-mythic); }
+
+    .die-card.rarity-common { background: var(--rarity-common); }
+    .die-card.rarity-uncommon { background: var(--rarity-uncommon); }
+    .die-card.rarity-rare { background: var(--rarity-rare); }
+    .die-card.rarity-legendary { background: var(--rarity-legendary); }
+    .die-card.rarity-mythic { background: var(--rarity-mythic); }
+
     .face-chip .mini-tag { padding: 2px 6px; border-radius: 999px; background: rgba(255,255,255,0.1); font-size: 11px; }
 
     .inventory-row { display: flex; flex-direction: column; gap: 10px; }
@@ -191,6 +212,19 @@
     .log-entry { color: var(--muted); font-size: 13px; margin: 4px 0; }
 
     .badge { padding: 4px 8px; background: rgba(255,255,255,0.08); border-radius: 999px; font-size: 12px; }
+
+    .rarity-tag { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.35); }
+    .rarity-common { background: var(--rarity-common); border-color: rgba(255,255,255,0.12); }
+    .rarity-uncommon { background: var(--rarity-uncommon); border-color: rgba(110, 225, 255, 0.35); }
+    .rarity-rare { background: var(--rarity-rare); border-color: rgba(170, 140, 255, 0.5); }
+    .rarity-legendary { background: var(--rarity-legendary); border-color: rgba(255, 200, 120, 0.7); }
+    .rarity-mythic { background: var(--rarity-mythic); border-color: rgba(255, 110, 110, 0.85); }
+
+    .list-item.rarity-common { background: var(--rarity-common); }
+    .list-item.rarity-uncommon { background: var(--rarity-uncommon); }
+    .list-item.rarity-rare { background: var(--rarity-rare); }
+    .list-item.rarity-legendary { background: var(--rarity-legendary); }
+    .list-item.rarity-mythic { background: var(--rarity-mythic); }
 
     .empty { color: var(--muted); font-size: 14px; }
 
@@ -233,13 +267,36 @@
       padding: 16px;
     }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
 
     .start-panel {
       text-align: center;
       padding: 32px;
       gap: 18px;
     }
+
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 12px auto;
+      max-width: 820px;
+    }
+
+    .character-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      text-align: left;
+      transition: border 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+    }
+
+    .character-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .character-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,255,255,0.08); }
+    .character-card h3 { margin: 0 0 6px; font-size: 16px; }
+    .character-card .meta { color: var(--muted); font-size: 13px; }
 
     .hero-title { font-size: 32px; margin: 0; letter-spacing: 2px; text-transform: uppercase; }
     .hero-sub { color: var(--muted); margin: 4px 0 16px; }
@@ -315,12 +372,12 @@
         </div>
         <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
           <label class="list-item" style="display:block;">
-            <div><strong>Starting dice</strong><div class="meta">Number of apprentice dice at game start (1-9)</div></div>
+              <div><strong>Starting dice</strong><div class="meta">Number of apprentice dice at game start (1-9)</div></div>
             <input id="settingStartingDice" type="number" min="1" max="9" value="3" style="width:100%; margin-top:6px;">
           </label>
           <label class="list-item" style="display:block;">
             <div><strong>Starting gold</strong><div class="meta">Initial coins at game start (0+)</div></div>
-            <input id="settingStartingGold" type="number" min="0" value="3" style="width:100%; margin-top:6px;">
+            <input id="settingStartingGold" type="number" min="0" value="0" style="width:100%; margin-top:6px;">
           </label>
           <label class="list-item" style="display:block;">
             <div><strong>Rounds</strong><div class="meta">How many rounds per game (1-99)</div></div>
@@ -331,6 +388,20 @@
             <input id="settingShopSlots" type="number" min="1" max="6" value="3" style="width:100%; margin-top:6px;">
           </label>
         </div>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px; margin-top:10px;">
+          <div class="list-item" style="display:block;">
+            <div><strong>Toggle shop items</strong><div class="meta">Enable/disable individual shop items.</div></div>
+            <div id="settingItemToggles" class="inventory-row" style="max-height:160px; overflow:auto; margin-top:8px;"></div>
+          </div>
+          <div class="list-item" style="display:block;">
+            <div><strong>Toggle dice types</strong><div class="meta">Enable/disable which dice appear for sale.</div></div>
+            <div id="settingDieToggles" class="inventory-row" style="max-height:160px; overflow:auto; margin-top:8px;"></div>
+          </div>
+          <div class="list-item" style="display:block;">
+            <div><strong>Toggle face offers</strong><div class="meta">Enable/disable which faces can appear in the face shop.</div></div>
+            <div id="settingFaceToggles" class="inventory-row" style="max-height:160px; overflow:auto; margin-top:8px;"></div>
+          </div>
+        </div>
         <div class="cta-row" style="margin-top:12px; justify-content:flex-end;">
           <button id="resetSettings">Reset Defaults</button>
           <button id="saveSettings">Save Settings</button>
@@ -339,33 +410,60 @@
     </div>
 
     <section id="startScreen" class="panel start-panel">
-      <h2 class="hero-title">Dice Potions</h2>
-      <div class="hero-sub">Roll, brew, trade. Choose your path.</div>
-      <div class="cta-row" style="justify-content:center;">
-        <button id="startGameBtn">Start Game</button>
-        <button id="startRecipeBtn">Recipe Book</button>
+      <div id="startIntro">
+        <h2 class="hero-title">Dice Potions</h2>
+        <div class="hero-sub">Roll, brew, trade. Choose your path.</div>
+        <div class="cta-row" style="justify-content:center; margin-bottom:8px;">
+          <button id="startHowToBtn">How to Play</button>
+        </div>
+        <div id="howToPlay" class="list hidden" style="text-align:left; max-width:680px; margin:0 auto; gap:6px; color: var(--muted);">
+          <div class="list-item" style="background: rgba(255,255,255,0.04);">
+            <div><strong>1) Roll</strong><div class="meta">Roll your dice for gold and ingredients. Effects (gold boosts, shields, wilds) trigger automatically.</div></div>
+          </div>
+          <div class="list-item" style="background: rgba(255,255,255,0.04);">
+            <div><strong>2) Brew</strong><div class="meta">Add ingredients to the cauldron to match a recipe, then Brew. Potions can be consumed for effects or sold for gold.</div></div>
+          </div>
+          <div class="list-item" style="background: rgba(255,255,255,0.04);">
+            <div><strong>3) Shop</strong><div class="meta">Buy items, dice, and faces between rolls. Use reroll tokens or gold to refresh the shop. Permanent items add ongoing effects.</div></div>
+          </div>
+          <div class="list-item" style="background: rgba(255,255,255,0.04);">
+            <div><strong>4) Next Round</strong><div class="meta">After shopping, start the next round. Survive the set number of rounds with the most value you can brew and sell.</div></div>
+          </div>
+        </div>
+        <div class="cta-row" style="justify-content:center;">
+          <button id="startGameBtn">Start Game</button>
+          <button id="startRecipeBtn">Recipe Book</button>
+        </div>
+        <div class="cta-row" style="justify-content:center;">
+          <button id="startStatsBtn">Player Stats</button>
+          <button id="startSettingsBtn">Settings</button>
+        </div>
       </div>
-      <div class="cta-row" style="justify-content:center;">
-        <button id="startStatsBtn">Player Stats</button>
-        <button id="startSettingsBtn">Settings</button>
+
+      <div id="characterSelectView" class="hidden">
+        <h2 class="hero-title">Choose Your Brewer</h2>
+        <div class="hero-sub">Each brewer starts with a unique perk.</div>
+        <div id="characterGrid" class="character-grid hidden"></div>
+        <div class="cta-row" style="justify-content:center; margin-top:8px;">
+          <button id="chooseCharacterBtn">Choose Character</button>
+        </div>
       </div>
     </section>
 
-    <div id="playView">
+    <div id="playView" class="hidden">
       <div class="grid" id="rollStage">
         <section class="panel" id="dicePanel">
           <div class="flex space-between" style="align-items:flex-start;">
             <div>
               <h2>Roll & Brew</h2>
-              <div class="stats">
+              <div class="stats nowrap">
                 <span class="stat-pill">Round <span id="roundLabel"></span></span>
                 <span class="stat-pill">Gold: <span id="goldLabel"></span></span>
-                <span class="stat-pill">Dice: <span id="diceLabel"></span></span>
-                <span class="stat-pill">Potions: <span id="potionCount"></span></span>
+                <span class="stat-pill">Score: <span id="scoreLabel"></span></span>
               </div>
               <div class="hint">Coins give instant gold; ingredients only pay when brewed and sold.</div>
             </div>
-            <div class="cta-row">
+            <div class="cta-row nowrap">
               <button id="rollBtn">Roll Dice</button>
               <button id="toShopBtn" disabled>Go To Store</button>
               <button id="nextBtn" class="hidden" disabled>Next Round</button>
@@ -392,9 +490,6 @@
             </div>
           </div>
           <div id="potionsList" class="list"></div>
-          <div class="cta-row hidden">
-            <button id="sellAll" disabled>Sell All Potions</button>
-          </div>
         </section>
 
         <section class="panel" style="grid-column: 1 / -1;">
@@ -412,12 +507,16 @@
             <h2>Inventory</h2>
             <div class="flex" style="gap:8px; align-items:center;">
               <span class="stat-pill">Gold: <span id="invGold"></span></span>
+              <span class="stat-pill">Dice: <span id="invDice"></span></span>
               <button id="backToBrew">Start Next Round</button>
             </div>
           </div>
           <h3>Dice</h3>
           <div id="diceInventoryList" class="inventory-row"></div>
           <h3>Potions</h3>
+          <div class="cta-row" style="margin-bottom:6px;">
+            <button id="sellAllShop" disabled>Sell All Potions</button>
+          </div>
           <div id="potionInventoryList" class="inventory-row"></div>
           <h3>Items</h3>
           <div id="itemInventoryList" class="inventory-row"></div>
@@ -437,6 +536,9 @@
           <h2>Dice For Sale</h2>
           <div class="hint">Each die shows its six faces.</div>
           <div id="diceShopList" class="inventory-row"></div>
+          <h2>Die Faces For Sale</h2>
+          <div class="hint">Buy a face, then click a face on one of your dice to swap it in.</div>
+          <div id="faceShopList" class="list"></div>
         </section>
       </div>
 
@@ -453,13 +555,24 @@
   <script>
     // Game data
     const ingredients = ['health', 'mana', 'flame', 'essence', 'toxin'];
+    const ingredientLabels = {
+      health: 'Health Leaf',
+      mana: 'Mana Bloom',
+      flame: 'Flame Pepper',
+      essence: 'Golden Essence',
+      toxin: 'Toxic Spores'
+    };
 
     const defaultSettings = {
       startingDice: 3,
-      startingGold: 3,
+      startingGold: 0,
       maxRounds: 10,
-      shopItemSlots: 3
+      shopItemSlots: 3,
+      enabledItems: null,
+      enabledDiceTypes: null,
+      enabledFaces: null
     };
+
 
     let settings = { ...defaultSettings };
 
@@ -469,6 +582,7 @@
       potionsConsumed: 0,
       potionValue: 0,
       itemsBought: 0,
+      highScore: 0,
       ingredients: { health: 0, mana: 0, flame: 0, essence: 0, toxin: 0 }
     };
 
@@ -502,7 +616,7 @@
         { kind: 'ingredient', ingredient: 'mana', label: 'Mana Bloom', tag: 'mana' },
         { kind: 'ingredient', ingredient: 'essence', label: 'Golden Essence', tag: 'essence' },
         { kind: 'ingredient', ingredient: 'flame', label: 'Flame Pepper', tag: 'flame' },
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
         { kind: 'effect', effect: 'doubleHighestGold', label: 'Double your best gold die', tag: 'effect' }
       ] },
       { id: 'herbal', name: 'Herbalist Die', price: 5, faces: [
@@ -541,7 +655,7 @@
         { kind: 'ingredient', ingredient: 'essence', label: 'Golden Essence', tag: 'essence' },
         { kind: 'ingredient', ingredient: 'essence', label: 'Golden Essence', tag: 'essence' },
         { kind: 'gold', gold: 2, label: 'Coins +2', tag: 'gold' },
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
         { kind: 'effect', effect: 'boostGold', label: '+1 Gold per ingredient rolled', tag: 'effect' },
         { kind: 'blank', label: 'Void face', tag: 'blank' }
       ] },
@@ -554,8 +668,8 @@
         { kind: 'effect', effect: 'doubleHighestGold', label: 'Double your best gold die', tag: 'effect' }
       ] },
       { id: 'wildling', name: 'Wildling Die', price: 7, faces: [
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
         { kind: 'ingredient', ingredient: 'health', label: 'Health Leaf', tag: 'health' },
         { kind: 'ingredient', ingredient: 'mana', label: 'Mana Bloom', tag: 'mana' },
         { kind: 'ingredient', ingredient: 'flame', label: 'Flame Pepper', tag: 'flame' },
@@ -590,7 +704,7 @@
         { kind: 'ingredient', ingredient: 'essence', label: 'Golden Essence', tag: 'essence' },
         { kind: 'ingredient', ingredient: 'mana', label: 'Mana Bloom', tag: 'mana' },
         { kind: 'gold', gold: 4, label: 'Coins +4', tag: 'gold' },
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
         { kind: 'effect', effect: 'doubleHighestGold', label: 'Double your best gold die', tag: 'effect' }
       ] },
       { id: 'manastorm', name: 'Manastorm Die', price: 7, faces: [
@@ -622,7 +736,7 @@
         { kind: 'ingredient', ingredient: 'mana', label: 'Mana Bloom', tag: 'mana' },
         { kind: 'ingredient', ingredient: 'essence', label: 'Golden Essence', tag: 'essence' },
         { kind: 'gold', gold: 3, label: 'Coins +3', tag: 'gold' },
-        { kind: 'effect', effect: 'wildIngredient', label: '+1 missing ingredient', tag: 'effect' },
+        { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' },
         { kind: 'blank', label: 'Void face', tag: 'blank' }
       ] },
       { id: 'budget', name: 'Budget Die', price: 3, faces: [
@@ -642,56 +756,232 @@
         { kind: 'effect', effect: 'doubleHighestGold', label: 'Double your best gold die', tag: 'effect' }
       ] }
     ];
+    const diceRegistry = {};
+
+    function registerDieDef(def) {
+      diceRegistry[def.id] = def;
+    }
+
+    diceCatalog.forEach(registerDieDef);
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function weightedPick(arr, weightFn = () => 1) {
+      if (!arr.length) return null;
+      const weights = arr.map(weightFn);
+      const total = weights.reduce((a, b) => a + b, 0);
+      if (total <= 0) return pick(arr);
+      let r = Math.random() * total;
+      for (let i = 0; i < arr.length; i += 1) {
+        r -= weights[i];
+        if (r <= 0) return arr[i];
+      }
+      return arr[arr.length - 1];
+    }
+
+    const dieBaseTiers = [
+      { id: 'apprenticeBase', adj: 'Apprentice', price: 4, goldValues: [1, 2, 3], weight: 1.2 },
+      { id: 'journeymanBase', adj: 'Journeyman', price: 6, goldValues: [2, 3, 4], weight: 1.0 },
+      { id: 'masterworkBase', adj: 'Masterwork', price: 8, goldValues: [3, 4, 5], weight: 0.6 }
+    ];
+
+    const dieIngredientPacks = [
+      { id: 'herbalPack', adj: 'Herbal', price: 2, faces: ['health', 'health'], weight: 1.1 },
+      { id: 'manaPack', adj: 'Arcane', price: 2, faces: ['mana', 'mana'], weight: 1.0 },
+      { id: 'flamePack', adj: 'Blazing', price: 2, faces: ['flame', 'flame'], weight: 1.0 },
+      { id: 'essencePack', adj: 'Gilded', price: 3, faces: ['essence', 'essence'], weight: 0.6 },
+      { id: 'wildPack', adj: 'Prismatic', price: 4, faces: ['health', 'mana', 'flame'], weight: 0.5 },
+      { id: 'mixedPack', adj: 'Forager', price: 2, faces: ['health', 'mana', 'essence'], weight: 0.9 }
+    ];
+
+    const dieEffectPacks = [
+      { id: 'fortune', adj: 'Fortune', price: 2, face: { kind: 'effect', effect: 'doubleHighestGold', label: 'Double your best gold die', tag: 'effect' }, weight: 0.25 },
+      { id: 'copycat', adj: 'Copycat', price: 2, face: { kind: 'effect', effect: 'copyIngredient', label: 'Copy a rolled ingredient', tag: 'effect' }, weight: 0.7 },
+      { id: 'wild', adj: 'Wild', price: 2, face: { kind: 'effect', effect: 'wildIngredient', label: 'Random ingredient', tag: 'effect' }, weight: 0.7 },
+      { id: 'greedy', adj: 'Greedy', price: 2, face: { kind: 'effect', effect: 'boostGold', label: '+1 Gold per ingredient rolled', tag: 'effect' }, weight: 1.0 },
+      { id: 'jackpot', adj: 'Jackpot', price: 3, face: { kind: 'effect', effect: 'doubleGoldAll', label: 'Double all Gold this roll', tag: 'effect' }, weight: 0.15 },
+      { id: 'attuned', adj: 'Attuned', price: 3, face: { kind: 'effect', effect: 'doubleIngredient', ing: 'essence', label: 'Double essence this roll', tag: 'effect' }, weight: 0.2 }
+    ];
+
+    function faceForIngredient(ing) {
+      return { kind: 'ingredient', ingredient: ing, label: ingredientLabels[ing] || ing, tag: ing };
+    }
+
+    const ingredientValues = { mana: 2, health: 3, flame: 5, essence: 7, toxin: 4 };
+    function recipeSell(ings, bonus = 0) {
+      const base = ings.reduce((sum, ing) => sum + (ingredientValues[ing] || 2), 0);
+      const sizeBonus = Math.max(0, ings.length - 1) * 2;
+      const rarityBonus = ings.filter((i) => i === 'flame' || i === 'essence' || i === 'toxin').length;
+      return base + sizeBonus + rarityBonus + bonus;
+    }
+
+    function makeGeneratedDie() {
+      const base = weightedPick(dieBaseTiers, (b) => b.weight || 1);
+      const pack = weightedPick(dieIngredientPacks, (p) => p.weight || 1);
+      const eff = weightedPick(dieEffectPacks, (e) => e.weight || 1);
+      const goldValues = shuffle(base.goldValues).slice(0, 2);
+      const faces = [];
+      goldValues.forEach((g) => faces.push({ kind: 'gold', gold: g, label: `Coins +${g}`, tag: 'gold' }));
+      pack.faces.forEach((ing) => faces.push(faceForIngredient(ing)));
+      faces.push({ ...eff.face });
+      while (faces.length < 6) {
+        faces.push({ kind: 'blank', label: 'Void face', tag: 'blank' });
+      }
+      const name = `${eff.adj} ${pack.adj} ${base.adj} Die`;
+      const price = base.price + pack.price + eff.price;
+      const id = `gen-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      const def = { id, name, price, faces };
+      registerDieDef(def);
+      return def;
+    }
 
     const recipes = [
-      // Single-ingredient brews
-      { id: 'mana_single', name: 'Focus Draught', ingredients: ['mana'], sell: 3, consume: { type: 'reroll', text: 'Gain 1 reroll token', rerolls: 1 } },
-      { id: 'health_single', name: 'Minor Remedy', ingredients: ['health'], sell: 3, consume: { type: 'heal', text: '+1 temp die next roll', dice: 1 } },
-      { id: 'flame_single', name: 'Cinder Shot', ingredients: ['flame'], sell: 3, consume: { type: 'boost', text: '+1 Gold next roll', perDie: 0, gold: 1 } },
+      // Single-ingredient brews (building blocks)
+      { id: 'mana_single', name: 'Focus Draught', ingredients: ['mana'], sell: recipeSell(['mana']), consume: { type: 'reroll', text: 'Gain 1 shop reroll token (refresh shop)', rerolls: 1 } },
+      { id: 'health_single', name: 'Minor Remedy', ingredients: ['health'], sell: recipeSell(['health']), consume: { type: 'dieReroll', text: 'Gain 1 die reroll (click a die after rolling)' } },
 
-      // Two-ingredient staples
-      { id: 'health_mana', name: 'Rejuvenation Draught', ingredients: ['health', 'mana'], sell: 6, consume: { type: 'heal', text: '+1 die (temp)', dice: 1 } },
-      { id: 'flame_essence', name: 'Dragon Breath', ingredients: ['flame', 'essence'], sell: 8, consume: { type: 'gold', text: '+4 Gold now', gold: 4 } },
-      { id: 'mana_essence', name: 'Arcane Charge', ingredients: ['mana', 'essence'], sell: 7, consume: { type: 'reroll', text: '1 free reroll next round', rerolls: 1 } },
-      { id: 'flame_mana', name: 'Sparkshot Elixir', ingredients: ['flame', 'mana'], sell: 5, consume: { type: 'boost', text: '+1 Gold per die next roll', perDie: 1 } },
-      { id: 'health_essence', name: 'Golden Poultice', ingredients: ['health', 'essence'], sell: 6, consume: { type: 'heal', text: 'Heal + shield toxin', dice: 0, shields: 1 } },
-      { id: 'mana_mana', name: 'Twin Focus', ingredients: ['mana', 'mana'], sell: 5, consume: { type: 'reroll', text: '+2 reroll tokens', rerolls: 2 } },
-      { id: 'essence_toxin', name: 'Purging Vapor', ingredients: ['essence', 'toxin'], sell: 6, consume: { type: 'shield', text: 'Negate next toxin & gain 2 Gold', shields: 1, gold: 2 } },
+      // Two-ingredient staples (mana/health base, rares augment)
+      { id: 'health_mana', name: 'Rejuvenation Draught', ingredients: ['health', 'mana'], sell: recipeSell(['health', 'mana']), consume: { type: 'cloneDie', text: 'Next roll gains a bonus copy of a random die' } },
+      { id: 'mana_flame', name: 'Sparkshot Elixir', ingredients: ['mana', 'flame'], sell: recipeSell(['mana', 'flame']), consume: { type: 'boost', text: '+3 Gold per die next roll', perDie: 3 } },
+      { id: 'health_flame', name: 'Cinder Guard', ingredients: ['health', 'flame'], sell: recipeSell(['health', 'flame'], 1), consume: { type: 'reroll', text: 'Gain 3 shop reroll tokens (refresh shop)', rerolls: 3 } },
+      { id: 'mana_essence', name: 'Arcane Charge', ingredients: ['mana', 'essence'], sell: recipeSell(['mana', 'essence']), consume: { type: 'delayedIngredients', text: 'Gain 1 Mana and 1 Essence next roll', ingredients: ['mana', 'essence'] } },
+      { id: 'health_essence', name: 'Golden Poultice', ingredients: ['health', 'essence'], sell: recipeSell(['health', 'essence']), consume: { type: 'passiveGoldPerRound', text: 'Gain +4 Gold each round for the rest of the game', amount: 4 } },
+      { id: 'mana_toxin', name: 'Smokestack Veil', ingredients: ['mana', 'toxin'], sell: recipeSell(['mana', 'toxin']), consume: { type: 'randomShopItems', text: 'Gain 2 random shop items (free)', count: 2 } },
+      { id: 'health_toxin', name: 'Purging Balm', ingredients: ['health', 'toxin'], sell: recipeSell(['health', 'toxin']), consume: { type: 'convertIngredients', text: 'Next roll: each toxin becomes 2 essence', from: 'toxin', to: 'essence', multiplier: 2 } },
 
-      // Three-ingredient brews
-      { id: 'health_health_flame', name: 'Bulwark Tonic', ingredients: ['health', 'health', 'flame'], sell: 9, consume: { type: 'shield', text: 'Negate next toxin', shields: 1 } },
-      { id: 'flame_mana_essence', name: 'Solar Surge', ingredients: ['flame', 'mana', 'essence'], sell: 10, consume: { type: 'gold', text: '+6 Gold now', gold: 6 } },
-      { id: 'health_mana_essence', name: 'Aegis Brew', ingredients: ['health', 'mana', 'essence'], sell: 10, consume: { type: 'heal', text: '+1 die and shield toxin', dice: 1, shields: 1 } },
-      { id: 'mana_mana_flame', name: 'Overcharge', ingredients: ['mana', 'mana', 'flame'], sell: 9, consume: { type: 'boost', text: '+2 Gold per die next roll', perDie: 2 } },
-      { id: 'health_flame_toxin', name: 'Scorch Cleanse', ingredients: ['health', 'flame', 'toxin'], sell: 8, consume: { type: 'shield', text: 'Clear toxins and gain 3 Gold', shields: 1, gold: 3 } },
-      // New simple brews (no effects)
-      { id: 'triple_health', name: 'Grand Remedy', ingredients: ['health', 'health', 'health'], sell: 7, consume: { type: 'none', text: 'No effect' } },
-      { id: 'triple_mana', name: 'Pure Focus', ingredients: ['mana', 'mana', 'mana'], sell: 7, consume: { type: 'none', text: 'No effect' } },
-      { id: 'flame_flame_health', name: 'Phoenix Draught', ingredients: ['flame', 'flame', 'health'], sell: 9, consume: { type: 'none', text: 'No effect' } },
-      { id: 'essence_health_mana', name: 'Calm Elixir', ingredients: ['essence', 'health', 'mana'], sell: 8, consume: { type: 'none', text: 'No effect' } }
+      // Three-ingredient brews (commons with rare boosts)
+      { id: 'health_mana_flame', name: 'Phoenix Aid', ingredients: ['health', 'mana', 'flame'], sell: 20, consume: { type: 'boost', text: '+3 Gold per die next roll', perDie: 3 } },
+      { id: 'health_mana_essence', name: 'Aegis Brew', ingredients: ['health', 'mana', 'essence'], sell: recipeSell(['health', 'mana', 'essence'], 2), consume: { type: 'ingToGold', text: 'Next roll: each ingredient converts to 6 Gold', goldPerIng: 6 } },
+      { id: 'health_mana_toxin', name: 'Ward of Thorns', ingredients: ['health', 'mana', 'toxin'], sell: recipeSell(['health', 'mana', 'toxin'], 1), consume: { type: 'goldToIngredient', text: 'Next roll: each coin becomes a random ingredient' } },
+      { id: 'health_flame_essence', name: 'Solar Surge', ingredients: ['health', 'flame', 'essence'], sell: recipeSell(['health', 'flame', 'essence'], 3), consume: { type: 'passiveGoldPerRound', text: 'Gain +8 Gold each round for the rest of the game', amount: 8 } },
+      { id: 'mana_flame_essence', name: 'Arcane Inferno', ingredients: ['mana', 'flame', 'essence'], sell: recipeSell(['mana', 'flame', 'essence'], 3), consume: { type: 'ingredientMultiplier', text: 'Flame ingredients count double permanently', ing: 'flame', multiplier: 2 } },
+      { id: 'health_flame_toxin', name: 'Scorch Cleanse', ingredients: ['health', 'flame', 'toxin'], sell: recipeSell(['health', 'flame', 'toxin'], 2), consume: { type: 'potionSellBonus', text: 'Next round: potions sell for +13 Gold', amount: 13 } },
+      { id: 'mana_flame_toxin', name: 'Venom Spark', ingredients: ['mana', 'flame', 'toxin'], sell: recipeSell(['mana', 'flame', 'toxin'], 2), consume: { type: 'duplicateDiceLoseRound', text: 'Next roll: duplicate all dice, lose 1 max round' } },
+      { id: 'toxin_triple_coinflip', name: 'Snakebite Lottery', ingredients: ['toxin', 'toxin', 'toxin'], sell: recipeSell(['toxin', 'toxin', 'toxin'], 3), consume: { type: 'coinFlipJackpot', text: '50%: gain 100 Gold; 50%: run ends immediately', gold: 100 } },
+
+      // High-end brews (rare-heavy)
+      { id: 'flame_essence_toxin', name: "Dragon's Bane Vapor", ingredients: ['flame', 'essence', 'toxin'], sell: recipeSell(['flame', 'essence', 'toxin'], 5), consume: { type: 'dieReroll', text: 'Gain 8 die rerolls (use after rolling)', amount: 8 } },
+      { id: 'flame_flame_essence_toxin', name: 'Hellfire Panacea', ingredients: ['flame', 'flame', 'essence', 'toxin'], sell: recipeSell(['flame', 'flame', 'essence', 'toxin'], 8), consume: { type: 'unusedIngGold', text: 'Next round: +30 Gold per unused Flame/Essence/Toxin', amount: 30, ings: ['flame', 'essence', 'toxin'] } },
+      { id: 'essence_essence_flame_mana_health', name: 'Astral Crucible', ingredients: ['essence', 'essence', 'flame'], sell: recipeSell(['essence', 'essence', 'flame'], 4), rarity: 'rare', consume: { type: 'addDieSlot', text: 'Permanently gain +1 die slot (cap 9)' } },
+      { id: 'health_mana_flame_essence', name: 'Grand Aegis', ingredients: ['health', 'mana', 'flame', 'essence'], sell: recipeSell(['health', 'mana', 'flame', 'essence'], 6), consume: { type: 'passiveGoldPerRound', text: 'Gain +15 Gold each round (permanent)', amount: 15 } },
+      { id: 'health_mana_flame_toxin', name: 'Plaguefire Bulwark', ingredients: ['health', 'mana', 'flame', 'toxin'], sell: recipeSell(['health', 'mana', 'flame', 'toxin'], 7), consume: { type: 'empowerDie', text: 'Choose a die: coins x3 & ingredient rolls x2 (permanent)', goldMult: 3, ingMult: 2 } },
+      { id: 'mana_flame_essence_toxin', name: 'Voidfire Draught', ingredients: ['mana', 'flame', 'essence', 'toxin'], sell: recipeSell(['mana', 'flame', 'essence', 'toxin'], 9), consume: { type: 'score', text: 'Gain 50 points immediately', amount: 50 } },
+      { id: 'grand_transmutation', name: 'Grand Transmutation', ingredients: ['health', 'mana', 'flame', 'essence', 'toxin'], sell: recipeSell(['health', 'mana', 'flame', 'essence', 'toxin'], 12), consume: { type: 'sacrificeDoubleRoll', text: 'Sacrifice a die: next roll coins/ingredients doubled; lose 1 max die' } },
+      { id: 'cataclysmic_surge', name: 'Cataclysmic Surge', ingredients: ['mana', 'mana', 'flame', 'essence', 'toxin'], sell: recipeSell(['mana', 'mana', 'flame', 'essence', 'toxin'], 14), consume: { type: 'goldMultiplier', text: 'Next roll: Gold faces pay 10×', multiplier: 10 } },
+      { id: 'philosophers_stone', name: "Philosopher's Stone", ingredients: ['health', 'health', 'mana', 'flame', 'essence', 'toxin'], sell: recipeSell(['health', 'health', 'mana', 'flame', 'essence', 'toxin'], 18), consume: { type: 'extendMaxRounds', text: 'Extend the run by +1 round (play one extra round)', amount: 1 } }
     ];
 
     const shopStock = [
       { id: 'maxCap', name: 'Expand Dice Cap', cost: 8, desc: '+1 to max dice (cap 9)', consumable: false, action: (s) => { s.maxDice = Math.min(9, s.maxDice + 1); return 'Max dice increased.'; } },
-      { id: 'buyDie', name: 'Hire New Die', cost: 6, desc: '+1 apprentice die (up to cap)', consumable: false, action: (s) => { if (s.dice.length >= s.maxDice) { return 'Already at cap.'; } s.dice.push(makeDie('apprentice')); return 'Gained one apprentice die.'; } },
-      { id: 'potionBook', name: 'Potion Book', cost: 4, desc: 'Reveal recipe hints and +1 reroll token', consumable: false, action: (s) => { s.knowledge = true; s.tokens.reroll += 1; return 'Knowledge shared. +1 reroll token.'; } },
-      { id: 'tokenPack', name: 'Shop Reroll Pack', cost: 4, desc: '+2 shop reroll tokens', consumable: false, action: (s) => { s.tokens.reroll += 2; return 'Gained 2 reroll tokens.'; } },
+      { id: 'tokenPack', name: 'Shop Reroll Pack', cost: 4, desc: '+2 shop reroll tokens (max 3)', consumable: false, action: (s) => { addRerollTokens(2, s); return 'Gained reroll tokens.'; } },
       { id: 'dieReroll', name: 'Die Reroll', cost: 5, desc: 'Reroll one rolled die of your choice this round', consumable: true, shopUsable: false, action: (s) => { if (!s.rolled || !s.currentRolls.length) return 'Roll first, then use this.'; s.pendingDieReroll = true; return 'Select a die to reroll by clicking it.'; } },
-      { id: 'shieldCharm', name: 'Shield Charm', cost: 5, desc: 'Gain a toxin shield for next roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'shield', amount: 1, expires: effectTargetRound() }); return 'Gained a shield for next roll.'; } },
-      { id: 'bonusDie', name: 'Temporary Die', cost: 6, desc: 'Gain +1 bonus die next roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'bonusDice', amount: 1, expires: effectTargetRound() }); return '+1 temp die next roll.'; } },
-      { id: 'perDieBoost', name: 'Per-Die Boost', cost: 5, desc: '+1 Gold per die next roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'perDieGold', amount: 1, expires: effectTargetRound() }); return 'Boosted next roll.'; } },
       { id: 'doubleGold', name: 'Gold Doubler', cost: 7, desc: 'Double all Gold you gain this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'goldDoubler', amount: 2, expires: effectTargetRound() }); return 'Gold will be doubled this roll.'; } },
-      { id: 'doubleMana', name: 'Mana Bloom Charm', cost: 5, desc: 'Double mana ingredients gained this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'doubleIng', ing: 'mana', expires: effectTargetRound() }); return 'Mana gains will be doubled this roll.'; } },
-      { id: 'doubleHealth', name: 'Herbal Infuser', cost: 5, desc: 'Double health ingredients gained this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'doubleIng', ing: 'health', expires: effectTargetRound() }); return 'Health gains will be doubled this roll.'; } },
-      { id: 'doubleFlame', name: 'Flame Bellows', cost: 5, desc: 'Double flame ingredients gained this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'doubleIng', ing: 'flame', expires: effectTargetRound() }); return 'Flame gains will be doubled this roll.'; } },
-      { id: 'doubleEssence', name: 'Essence Prism', cost: 6, desc: 'Double essence ingredients gained this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'doubleIng', ing: 'essence', expires: effectTargetRound() }); return 'Essence gains will be doubled this roll.'; } },
-      { id: 'doubleToxin', name: 'Toxin Splitter', cost: 4, desc: 'Double toxin ingredients gained this roll', consumable: true, shopUsable: false, action: (s) => { s.statuses.push({ type: 'doubleIng', ing: 'toxin', expires: effectTargetRound() }); return 'Toxin gains will be doubled this roll.'; } },
-      { id: 'reforge', name: 'Reforge', cost: 6, desc: 'Replace a die with random shop die', consumable: true, shopUsable: true, action: (s) => { if (!s.dice.length) return 'No dice to replace.'; const idx = Math.floor(Math.random() * s.dice.length); const dieType = pick(diceCatalog.filter((d) => d.price > 0)); s.dice[idx] = makeDie(dieType.id); return 'Reforged a die.'; } },
-      { id: 'potionSlot', name: 'Potion Carrier', cost: 5, desc: 'Instantly sell one potion for +2 value', consumable: true, action: (s) => { if (!s.potions.length) return 'No potions to sell.'; const p = s.potions.shift(); s.gold += p.sell + 2; s.stats.potionValue += p.sell + 2; return `Sold ${p.name} for ${p.sell + 2} Gold.`; } },
-      { id: 'cleanse', name: 'Toxin Cleanse', cost: 4, desc: 'Remove toxin ingredients from stash', consumable: true, action: (s) => { s.ingredients = s.ingredients.filter((i) => i !== 'toxin'); return 'Cleared toxin ingredients.'; } }
+      { id: 'goldPolish', name: 'Gold Polish', cost: 6, desc: '+2 Gold to each gold face this roll', consumable: true, shopUsable: false, preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'goldFaceBonus', amount: 2, expires: effectTargetRound() }); return 'Gold faces will each gain +2 this roll.'; } },
+      { id: 'spiceFinder', name: 'Spice Finder', cost: 6, desc: '+2 Gold per unique ingredient rolled this round', consumable: true, shopUsable: false, preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'uniqueGoldBonus', amount: 2, expires: effectTargetRound() }); return 'You will gain +2 Gold for each unique ingredient rolled.'; } },
+      { id: 'doubleMana', name: 'Mana Bloom Charm', cost: 5, desc: 'Double mana ingredients gained this roll', consumable: true, shopUsable: false, category: 'doubleIng', preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'doubleIng', ing: 'mana', expires: effectTargetRound() }); return 'Mana gains will be doubled this roll.'; } },
+      { id: 'doubleHealth', name: 'Herbal Infuser', cost: 5, desc: 'Double health ingredients gained this roll', consumable: true, shopUsable: false, category: 'doubleIng', preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'doubleIng', ing: 'health', expires: effectTargetRound() }); return 'Health gains will be doubled this roll.'; } },
+      { id: 'doubleFlame', name: 'Flame Bellows', cost: 5, desc: 'Double flame ingredients gained this roll', consumable: true, shopUsable: false, category: 'doubleIng', preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'doubleIng', ing: 'flame', expires: effectTargetRound() }); return 'Flame gains will be doubled this roll.'; } },
+      { id: 'doubleEssence', name: 'Essence Prism', cost: 6, desc: 'Double essence ingredients gained this roll', consumable: true, shopUsable: false, category: 'doubleIng', preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'doubleIng', ing: 'essence', expires: effectTargetRound() }); return 'Essence gains will be doubled this roll.'; } },
+      { id: 'doubleToxin', name: 'Toxin Splitter', cost: 4, desc: 'Double toxin ingredients gained this roll', consumable: true, shopUsable: false, category: 'doubleIng', preRollOnly: true, action: (s) => { if (s.rolled) return 'Use before rolling.'; s.statuses.push({ type: 'doubleIng', ing: 'toxin', expires: effectTargetRound() }); return 'Toxin gains will be doubled this roll.'; } },
+      { id: 'steadyMint', name: 'Steady Minting', cost: 6, desc: 'Gain +1 Gold for every gold face each roll', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'passiveGoldOnGold', amount: 1 }); return 'Passive unlocked: +1 Gold on every gold face each round.'; } },
+      { id: 'manaEcho', name: 'Mana Echo', cost: 5, desc: 'If you roll no Mana, gain 1 Mana automatically', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'passiveManaFloor', amount: 1 }); return 'Passive unlocked: gain 1 Mana when none is rolled.'; } },
+      { id: 'coinFloor', name: 'Coin Floor', cost: 7, desc: 'If your roll makes <=3 Gold, top it up to 5', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'passiveGoldFloor', floor: 5, threshold: 3 }); return 'Passive unlocked: low rolls are raised to 5 Gold.'; } },
+      { id: 'firstHealthDoubler', name: 'Vital Surge Sigil', cost: 11, desc: 'Permanent: first Health rolled each round is doubled', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'firstIngDoubler', ing: 'health', usedAtRound: 0 }); return 'Permanent: first Health each round is doubled.'; } },
+      { id: 'firstManaDoubler', name: 'Aether Echo Sigil', cost: 11, desc: 'Permanent: first Mana rolled each round is doubled', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'firstIngDoubler', ing: 'mana', usedAtRound: 0 }); return 'Permanent: first Mana each round is doubled.'; } },
+      { id: 'firstFlameDoubler', name: 'Ember Surge Sigil', cost: 11, desc: 'Permanent: first Flame rolled each round is doubled', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'firstIngDoubler', ing: 'flame', usedAtRound: 0 }); return 'Permanent: first Flame each round is doubled.'; } },
+      { id: 'firstEssenceDoubler', name: 'Auric Echo Sigil', cost: 11, desc: 'Permanent: first Essence rolled each round is doubled', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'firstIngDoubler', ing: 'essence', usedAtRound: 0 }); return 'Permanent: first Essence each round is doubled.'; } },
+      { id: 'firstToxinDoubler', name: 'Vile Echo Sigil', cost: 11, desc: 'Permanent: first Toxin rolled each round is doubled', consumable: false, permanent: true, action: (s) => { s.statuses.push({ type: 'firstIngDoubler', ing: 'toxin', usedAtRound: 0 }); return 'Permanent: first Toxin each round is doubled.'; } },
+      
     ];
 
+    const itemIds = shopStock.map((i) => i.id);
+    const dieTypeIds = diceCatalog.map((d) => d.id);
+    const faceKeys = [
+      'gold2', 'gold3', 'gold4', 'gold5',
+      'ing_health', 'ing_mana', 'ing_flame', 'ing_essence', 'ing_toxin',
+      'eff_doubleGoldAll', 'eff_doubleHighestGold', 'eff_copyIngredient', 'eff_wildIngredient', 'eff_boostGold',
+      'eff_doubleIng_health', 'eff_doubleIng_mana', 'eff_doubleIng_flame', 'eff_doubleIng_essence', 'eff_doubleIng_toxin',
+      'eff_score15',
+      'blank'
+    ];
+
+    function ensureToggleDefaults() {
+      if (!settings.enabledItems) {
+        settings.enabledItems = Object.fromEntries(itemIds.map((id) => [id, true]));
+      }
+      if (!settings.enabledDiceTypes) {
+        settings.enabledDiceTypes = Object.fromEntries(dieTypeIds.map((id) => [id, true]));
+      }
+      if (!settings.enabledFaces) {
+        settings.enabledFaces = Object.fromEntries(faceKeys.map((k) => [k, true]));
+      }
+    }
+
     const makeDie = (typeId) => ({ id: `die-${Math.random().toString(36).slice(2)}`, typeId });
+
+    const characterClasses = [
+      {
+        id: 'witch',
+        name: 'Witch Brewer',
+        desc: '+1 max die slot and start with a reroll token.',
+        apply: (s) => {
+          s.maxDice = Math.min(9, s.maxDice + 1);
+          addRerollTokens(1, s);
+        }
+      },
+      {
+        id: 'battle_mage',
+        name: 'Battle Mage',
+        desc: 'Begin with a Goldsmith Die in place of your first apprentice die.',
+        apply: (s) => {
+          const goldsmithDie = makeDie('goldsmith');
+          if (s.dice.length) {
+            s.dice[0] = goldsmithDie;
+          } else {
+            s.dice.push(goldsmithDie);
+          }
+        }
+      },
+      {
+        id: 'occultist',
+        name: 'Occultist',
+        desc: 'Gold earned above 5 each round is doubled.',
+        apply: (s) => {
+          s.statuses.push({ type: 'excessGoldDouble', threshold: 5 });
+        }
+      },
+      {
+        id: 'merchant',
+        name: 'Street Merchant',
+        desc: 'Shop rerolls are free.',
+        apply: (s) => {
+          s.statuses.push({ type: 'cheapShopReroll', cost: 0 });
+        }
+      },
+      {
+        id: 'chronomancer',
+        name: 'Chronomancer',
+        desc: 'Play one extra round (+1 max rounds).',
+        apply: (s) => {
+          s.maxRounds = Math.min(99, s.maxRounds + 1);
+        }
+      },
+      {
+        id: 'artificer',
+        name: 'Artificer',
+        desc: 'Permanent +1 Gold on every gold face.',
+        apply: (s) => {
+          s.statuses.push({ type: 'passiveGoldOnGold', amount: 1 });
+        }
+      }
+    ];
 
     function freshState() {
       const startDice = clamp(settings.startingDice, 1, 9);
@@ -706,25 +996,32 @@
         ingredients: [],
         potions: [],
         statuses: [],
-        tokens: { reroll: 0 },
+        tokens: { reroll: 0, removeFace: 0 },
+        shopRerollsLeft: 3,
         items: [],
         currentRolls: [],
         rollSnapshot: null,
         pendingDieReroll: false,
+        pendingDieSacrifice: null,
+        pendingDieEmpower: null,
         pendingDiePurchase: null,
+        pendingFacePurchase: null,
         knowledge: false,
         rolled: false,
         cauldron: [],
         shopOffers: sampleShopOffers(),
         diceShopOffers: sampleDiceOffers(),
+        faceShopOffers: sampleFaceOffers(),
         stats: {
           potionsBrewed: 0,
           potionsConsumed: 0,
           potionValue: 0,
           itemsBought: 0,
+          score: 0,
           ingredients: { health: 0, mana: 0, flame: 0, essence: 0, toxin: 0 }
         },
-        view: 'start'
+        view: 'start',
+        character: null
       };
     }
 
@@ -733,8 +1030,7 @@
     const els = {
       roundLabel: document.getElementById('roundLabel'),
       goldLabel: document.getElementById('goldLabel'),
-      diceLabel: document.getElementById('diceLabel'),
-      potionCount: document.getElementById('potionCount'),
+      scoreLabel: document.getElementById('scoreLabel'),
       progressBar: document.getElementById('progressBar'),
       diceRow: document.getElementById('diceRow'),
       ingredientsRow: document.getElementById('ingredientsRow'),
@@ -746,6 +1042,7 @@
       itemInventoryList: document.getElementById('itemInventoryList'),
       itemInventoryRoll: document.getElementById('itemInventoryRoll'),
       invGold: document.getElementById('invGold'),
+      invDiceLabel: document.getElementById('invDice'),
       brewBtn: document.getElementById('brewBtn'),
       clearCauldron: document.getElementById('clearCauldron'),
       autoBrewBtn: document.getElementById('autoBrewBtn'),
@@ -764,20 +1061,26 @@
       openRecipeBook: document.getElementById('openRecipeBook'),
       closeRecipeBook: document.getElementById('closeRecipeBook'),
       startScreen: document.getElementById('startScreen'),
+      startIntro: document.getElementById('startIntro'),
+      characterSelectView: document.getElementById('characterSelectView'),
       playView: document.getElementById('playView'),
       rollStage: document.getElementById('rollStage'),
       shopStage: document.getElementById('shopStage'),
       startGameBtn: document.getElementById('startGameBtn'),
+      chooseCharacterBtn: document.getElementById('chooseCharacterBtn'),
       startRecipeBtn: document.getElementById('startRecipeBtn'),
       startStatsBtn: document.getElementById('startStatsBtn'),
       startSettingsBtn: document.getElementById('startSettingsBtn'),
+      startHowToBtn: document.getElementById('startHowToBtn'),
+      howToPlay: document.getElementById('howToPlay'),
       toShopBtn: document.getElementById('toShopBtn'),
       backToBrew: document.getElementById('backToBrew'),
       statusRow: document.getElementById('statusRow'),
       log: document.getElementById('log'),
       rollBtn: document.getElementById('rollBtn'),
       nextBtn: document.getElementById('nextBtn'),
-      sellAll: document.getElementById('sellAll'),
+      sellAllShop: document.getElementById('sellAllShop'),
+      faceShopList: document.getElementById('faceShopList'),
       settingsModal: document.getElementById('settingsModal'),
       closeSettings: document.getElementById('closeSettings'),
       saveSettings: document.getElementById('saveSettings'),
@@ -785,11 +1088,222 @@
       settingStartingDice: document.getElementById('settingStartingDice'),
       settingStartingGold: document.getElementById('settingStartingGold'),
       settingMaxRounds: document.getElementById('settingMaxRounds'),
-      settingShopSlots: document.getElementById('settingShopSlots')
+      settingShopSlots: document.getElementById('settingShopSlots'),
+      settingItemToggles: document.getElementById('settingItemToggles'),
+      settingDieToggles: document.getElementById('settingDieToggles'),
+      settingFaceToggles: document.getElementById('settingFaceToggles'),
+      characterGrid: document.getElementById('characterGrid')
     };
+
+    let selectedCharacterId = null;
+
 
     function clamp(val, min, max) {
       return Math.min(max, Math.max(min, val));
+    }
+
+    function gainGold(amount) {
+      if (!amount || amount <= 0) return;
+      state.gold += amount;
+      state.stats.score += amount;
+    }
+
+    function potionSellBonusForRound() {
+      return state.statuses
+        .filter((s) => s.type === 'potionSellBonus' && s.expires === state.round)
+        .reduce((sum, s) => sum + (s.amount || 0), 0);
+    }
+
+    function addRerollTokens(amount, targetState = state) {
+      if (!targetState || !amount || amount <= 0) return;
+      targetState.tokens.reroll = Math.min(3, targetState.tokens.reroll + amount);
+    }
+
+    function shopRerollCost() {
+      const discount = state.statuses.find((s) => s.type === 'cheapShopReroll');
+      return discount && discount.cost !== undefined ? Math.max(0, discount.cost) : 3;
+    }
+
+    function applyExcessGoldBonus(goldBefore) {
+      const eff = state.statuses.find((s) => s.type === 'excessGoldDouble');
+      if (!eff) return;
+      const gained = state.gold - goldBefore;
+      const threshold = eff.threshold !== undefined ? eff.threshold : 5;
+      const over = gained - threshold;
+      if (over > 0) {
+        gainGold(over);
+        log(`Passive: doubled ${over} Gold above ${threshold}.`);
+      }
+    }
+
+    function grantShopItem(item) {
+      if (!item) return null;
+      if (item.consumable) {
+        const entry = {
+          id: `${item.id}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+          name: item.name,
+          desc: item.desc,
+          action: item.action,
+          shopUsable: item.shopUsable !== false,
+          preRollOnly: !!item.preRollOnly,
+          rarity: item.rarity || itemRarity(item)
+        };
+        state.items.push(entry);
+        return `Added ${item.name} to inventory.`;
+      }
+      const result = item.action(state);
+      return result || `Applied ${item.name}.`;
+    }
+
+    function renderCharacterSelect() {
+      if (!els.characterGrid || !characterClasses.length) return;
+      if (!selectedCharacterId) selectedCharacterId = characterClasses[0].id;
+      els.characterGrid.innerHTML = '';
+      characterClasses.forEach((c) => {
+        const card = document.createElement('div');
+        card.className = `character-card${selectedCharacterId === c.id ? ' selected' : ''}`;
+        card.innerHTML = `<h3>${c.name}</h3><div class="meta">${c.desc}</div>`;
+        card.onclick = () => {
+          selectedCharacterId = c.id;
+          renderCharacterSelect();
+        };
+        els.characterGrid.appendChild(card);
+      });
+    }
+
+    function rarityClass(rarity) {
+      return rarity ? `rarity-${rarity}` : '';
+    }
+
+    function getRecipeById(id) {
+      return recipes.find((r) => r.id === id);
+    }
+
+    function potionRarity(potion) {
+      const recipe = getRecipeById(potion.id) || potion;
+      if (recipe && recipe.rarity) return recipe.rarity;
+      const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      const ingCount = ingredients.length || 1;
+      const rareIngs = ['flame', 'essence', 'toxin'];
+      const rareCount = ingredients.filter((i) => rareIngs.includes(i)).length;
+
+      const clampTier = (t) => Math.max(0, Math.min(4, t));
+      const tierToName = (t) => ['common', 'uncommon', 'rare', 'legendary', 'mythic'][clampTier(t)];
+
+      let tier = 0; // 0=common, 1=uncommon, 2=rare, 3=legendary, 4=mythic
+      if (ingCount <= 1) {
+        tier = 0;
+      } else if (ingCount === 2) {
+        tier = rareCount > 0 ? 1 : 0;
+      } else if (ingCount === 3) {
+        tier = 1 + (rareCount > 0 ? 1 : 0);
+      } else {
+        tier = 2 + (rareCount > 0 ? 1 : 0); // 4 ingredients start one tier higher
+        tier += Math.max(0, ingCount - 4); // 5+ ingredients step up further
+      }
+
+      return tierToName(tier);
+    }
+
+    function itemRarity(item) {
+      const cost = item.cost || 0;
+      if (cost >= 11) return 'mythic';
+      if (cost >= 9) return 'legendary';
+      if (cost >= 7) return 'rare';
+      if (cost >= 5) return 'uncommon';
+      return 'common';
+    }
+
+    function rarityWeight(rarity) {
+      switch (rarity) {
+        case 'mythic': return 0.05;
+        case 'legendary': return 0.1;
+        case 'rare': return 0.25;
+        case 'uncommon': return 0.6;
+        default: return 1.5;
+      }
+    }
+
+    function highestFaceRarity(faces, costHint = 0) {
+      if (!faces || !faces.length) return 'common';
+      const rank = { common: 0, uncommon: 1, rare: 2, legendary: 3, mythic: 4 };
+      let best = 'common';
+      faces.forEach((f) => {
+        const r = faceRarity(f, costHint);
+        if (rank[r] > rank[best]) best = r;
+      });
+      return best;
+    }
+
+    function dieRarity(def, overrideFaces = null) {
+      if (!def && !overrideFaces) return 'common';
+      const faces = overrideFaces || (def && def.faces) || [];
+      if (faces.length) return highestFaceRarity(faces, def ? def.price || 0 : 0);
+      const price = def && def.price ? def.price : 0;
+      if (price >= 11) return 'mythic';
+      if (price >= 9) return 'legendary';
+      if (price >= 7) return 'rare';
+      if (price >= 5) return 'uncommon';
+      return 'common';
+    }
+
+    function faceRarity(face, cost = 0) {
+      if (!face) return 'common';
+      if (face.kind === 'effect') {
+        if (face.effect === 'scorePoints') return 'legendary';
+        if (face.effect === 'doubleGoldAll') return 'mythic';
+        if (face.effect === 'doubleHighestGold') return 'legendary';
+        if (face.effect === 'doubleIngredient') return 'rare';
+        return 'rare';
+      }
+      if (face.kind === 'gold') {
+        if (face.gold >= 5) return 'legendary';
+        if (face.gold >= 4) return 'rare';
+        if (face.gold >= 3) return 'uncommon';
+        return 'common';
+      }
+      if (face.kind === 'ingredient') {
+        return cost >= 4 ? 'uncommon' : 'common';
+      }
+      return 'common';
+    }
+
+    function faceRarityClass(face, cost = 0) {
+      return rarityClass(faceRarity(face, cost));
+    }
+
+    function getDieDef(typeId) {
+      return diceRegistry[typeId] || diceRegistry.apprentice;
+    }
+
+    function getDieFaces(die) {
+      const def = getDieDef(die.typeId);
+      if (die.faces && Array.isArray(die.faces) && die.faces.length) {
+        return die.faces;
+      }
+      return def ? def.faces : [];
+    }
+
+    function dieModifiers(die) {
+      if (!die) return [];
+      return state.statuses.filter((s) => s.type === 'dieMod' && s.dieId === die.id);
+    }
+
+    function cloneFace(face) {
+      return { ...face };
+    }
+
+    function cloneFaces(faces) {
+      return faces.map(cloneFace);
+    }
+
+    function cloneDie(die) {
+      if (!die) return null;
+      return {
+        id: `clone-${Math.random().toString(36).slice(2)}`,
+        typeId: die.typeId,
+        faces: cloneFaces(getDieFaces(die))
+      };
     }
 
     function log(text) {
@@ -803,30 +1317,39 @@
       return state.view === 'shop' ? state.round + 1 : state.round;
     }
 
-    // Ensure shop offers exist on load
-    refreshShopOffers();
-
     function setView(view) {
       state.view = view;
       const isStart = view === 'start';
+      const isCharacter = view === 'character';
       const inRoll = view === 'roll';
-      els.startScreen.classList.toggle('hidden', !isStart);
-      els.playView.classList.toggle('hidden', isStart);
+      const inStartScreens = isStart || isCharacter;
+      els.startScreen.classList.toggle('hidden', !inStartScreens);
+      els.playView.classList.toggle('hidden', inStartScreens);
       els.rollStage.classList.toggle('hidden', !inRoll);
       els.shopStage.classList.toggle('hidden', inRoll);
       els.rollBtn.disabled = !inRoll || state.rolled;
+      if (els.startIntro) els.startIntro.classList.toggle('hidden', !isStart);
+      if (els.characterSelectView) els.characterSelectView.classList.toggle('hidden', !isCharacter);
+      if (isStart && els.characterGrid && !els.characterGrid.classList.contains('hidden')) {
+        els.characterGrid.classList.add('hidden');
+      }
+      if (isCharacter && els.characterGrid) {
+        els.characterGrid.classList.remove('hidden');
+      }
     }
 
     function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
     function rollDie(die) {
-      const type = diceCatalog.find((d) => d.id === die.typeId) || diceCatalog[0];
-      return pick(type.faces);
+      const faces = getDieFaces(die);
+      if (!faces.length) return { kind: 'blank', label: 'Void face', tag: 'blank' };
+      return pick(faces);
     }
 
     function randomFaceForDie(die) {
-      const type = diceCatalog.find((d) => d.id === die.typeId) || diceCatalog[0];
-      return pick(type.faces);
+      const faces = getDieFaces(die);
+      if (!faces.length) return { kind: 'blank', label: 'Void face', tag: 'blank' };
+      return pick(faces);
     }
 
     function applyEffects(rolls, summary) {
@@ -838,21 +1361,43 @@
         if (face.kind !== 'effect') return;
         switch (face.effect) {
           case 'wildIngredient': {
-            const missing = ingredients.filter((i) => !summary.ingredients.includes(i));
-            const choice = missing.length ? pick(missing) : pick(ingredients);
+            const choice = pick(ingredients);
             summary.ingredients.push(choice);
             log(`Wild ingredient added: ${choice}`);
             break;
           }
+          case 'doubleGoldAll': {
+            state.statuses.push({ type: 'goldDoubler', amount: 2, expires: effectTargetRound() });
+            log('Effect: all Gold gains doubled this roll.');
+            break;
+          }
+          case 'goldMultiplier': {
+            const mult = effect.multiplier && effect.multiplier > 0 ? effect.multiplier : 1;
+            state.statuses.push({ type: 'goldMultiplier', amount: mult, expires: effectTargetRound() });
+            log(`Next roll: gold faces pay x${mult}.`);
+            break;
+          }
           case 'boostGold': {
             const gain = ingredientCount;
-            state.gold += gain;
+            gainGold(gain);
             log(`Effect: gained ${gain} Gold (per ingredient, ${ingredientCount} ingredients).`);
             break;
           }
           case 'doubleHighestGold': {
-            state.gold += goldFaces;
+            gainGold(goldFaces);
             log(`Effect: doubled highest gold (+${goldFaces}).`);
+            break;
+          }
+          case 'doubleIngredient': {
+            const targetIng = face.ing || pick(ingredients) || 'mana';
+            state.statuses.push({ type: 'doubleIng', ing: targetIng, expires: effectTargetRound() });
+            log(`Effect: ${targetIng} gains doubled this roll.`);
+            break;
+          }
+          case 'scorePoints': {
+            const amt = face.amount !== undefined ? face.amount : 15;
+            state.stats.score += amt;
+            log(`Effect: gained ${amt} points.`);
             break;
           }
           case 'copyIngredient': {
@@ -974,9 +1519,10 @@
       }
       rolls.forEach((entry, idx) => {
         const { face, die } = entry;
-        const type = diceCatalog.find((d) => d.id === die.typeId);
+        const type = getDieDef(die.typeId);
         const card = document.createElement('div');
-        card.className = 'die-card';
+        const rarityCls = faceRarityClass(face);
+        card.className = `die-card ${rarityCls}`.trim();
         if (state.pendingDieReroll) {
           card.style.cursor = 'pointer';
           card.style.outline = '1px solid var(--accent)';
@@ -1038,13 +1584,24 @@
       els.potionsList.innerHTML = '';
       if (!state.potions.length) {
         els.potionsList.innerHTML = '<div class="empty">No potions brewed yet.</div>';
+        if (els.sellAllShop) els.sellAllShop.disabled = true;
         return;
       }
+
+      if (els.sellAllShop) {
+        if (state.stage === 'roll') {
+          els.sellAllShop.disabled = true;
+        } else {
+          els.sellAllShop.disabled = false;
+        }
+      }
+
       state.potions.forEach((p) => {
-        const item = document.createElement('div');
-        item.className = 'list-item';
-        item.innerHTML = `<div><strong>${p.name}</strong><div class="meta">Value: ${p.sell} · Effect: ${p.consume.text}</div></div><div class="hint">Sell or consume in the store.</div>`;
-        els.potionsList.appendChild(item);
+        const row = document.createElement('div');
+        const rarity = potionRarity(p);
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
+        row.innerHTML = `<div><strong>${p.name}</strong><div class="meta">Sell ${p.sell} · Consume: ${p.consume.text}</div></div>`;
+        els.potionsList.appendChild(row);
       });
     }
 
@@ -1052,7 +1609,8 @@
       els.recipeBook.innerHTML = '';
       recipes.forEach((r) => {
         const row = document.createElement('div');
-        row.className = 'list-item';
+        const rarity = potionRarity(r);
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
         const ingRow = document.createElement('div');
         ingRow.className = 'pill-row';
         r.ingredients.forEach((i) => {
@@ -1094,14 +1652,19 @@
       }
       const list = document.createElement('div');
       list.className = 'list';
-      const entries = [
+      const entries = [];
+      if (data.score !== undefined) entries.push({ label: 'Score', value: data.score });
+      entries.push(
         { label: 'Potions brewed', value: data.potionsBrewed },
         { label: 'Potions consumed', value: data.potionsConsumed },
         { label: 'Total potion value', value: data.potionValue },
         { label: 'Items bought', value: data.itemsBought }
-      ];
+      );
       if (data.gamesPlayed !== undefined) {
         entries.unshift({ label: 'Games played', value: data.gamesPlayed });
+      }
+      if (data.highScore !== undefined) {
+        entries.push({ label: 'High score', value: data.highScore });
       }
       entries.forEach((row) => {
         const item = document.createElement('div');
@@ -1111,9 +1674,6 @@
       });
       const ing = document.createElement('div');
       ing.className = 'list-item';
-      const ingMeta = ingredients.map((i) => `${i}: ${data.ingredients ? data.ingredients[i] || 0 : 0}`).join(' · ');
-      ing.innerHTML = `<div><strong>Ingredients collected</strong><div class="meta">${ingMeta}</div></div>`;
-      list.appendChild(ing);
       target.appendChild(list);
     }
 
@@ -1133,25 +1693,106 @@
     }
 
     function sampleShopOffers() {
-      const copy = [...shopStock];
-      copy.sort(() => Math.random() - 0.5);
+      ensureToggleDefaults();
       const slots = clamp(settings.shopItemSlots, 1, 6);
-      return copy.slice(0, Math.min(slots, copy.length));
+      const filtered = shopStock.filter((i) => settings.enabledItems[i.id]);
+      const pool = [...filtered];
+      const pickWeighted = (arr) => {
+        const weights = arr.map((itm) => rarityWeight(itemRarity(itm)));
+        const total = weights.reduce((a, b) => a + b, 0);
+        if (total <= 0) return null;
+        let r = Math.random() * total;
+        for (let i = 0; i < arr.length; i += 1) {
+          r -= weights[i];
+          if (r <= 0) return i;
+        }
+        return arr.length - 1;
+      };
+      const out = [];
+      while (out.length < slots && pool.length) {
+        const idx = pickWeighted(pool);
+        if (idx === null || idx === undefined) break;
+        out.push(pool[idx]);
+        pool.splice(idx, 1);
+      }
+      return out;
     }
 
     function sampleDiceOffers() {
-      const purchasable = diceCatalog.filter((d) => d.price > 0);
-      const copy = [...purchasable];
-      copy.sort(() => Math.random() - 0.5);
-      const picks = copy.slice(0, Math.min(3, copy.length));
-      while (picks.length < 3) picks.push(null);
-      return picks;
+      // Generate fresh combo dice for the shop: a base tier + ingredient pack + effect pack
+      const offers = [];
+      while (offers.length < 3) {
+        offers.push(makeGeneratedDie());
+      }
+      return offers;
+    }
+
+    function priceFace(face) {
+      if (face.kind === 'gold') return Math.max(2, face.gold + 1);
+      if (face.kind === 'ingredient') return 3;
+      if (face.kind === 'effect') {
+        if (face.effect === 'scorePoints') return 9;
+        if (face.effect === 'doubleGoldAll') return 8;
+        if (face.effect === 'doubleHighestGold') return 6;
+        if (face.effect === 'doubleIngredient') return 6;
+        return 5;
+      }
+      return 2;
+    }
+
+    const DIE_SHOP_MARKUP = 1.3;
+    function dieShopCost(def) {
+      return Math.ceil((def && def.price ? def.price : 0) * DIE_SHOP_MARKUP);
+    }
+
+    function facePoolFromSettings() {
+      ensureToggleDefaults();
+      const enabled = settings.enabledFaces;
+      const pool = [];
+      if (enabled.gold2) pool.push({ kind: 'gold', gold: 2, label: 'Coins +2', tag: 'gold' });
+      if (enabled.gold3) pool.push({ kind: 'gold', gold: 3, label: 'Coins +3', tag: 'gold' });
+      if (enabled.gold4) pool.push({ kind: 'gold', gold: 4, label: 'Coins +4', tag: 'gold' });
+      if (enabled.gold5) pool.push({ kind: 'gold', gold: 5, label: 'Coins +5', tag: 'gold' });
+      ingredients.forEach((ing) => {
+        if (enabled[`ing_${ing}`]) pool.push(faceForIngredient(ing));
+      });
+      if (enabled.eff_doubleGoldAll) pool.push(cloneFace(dieEffectPacks.find((p) => p.id === 'jackpot').face));
+      if (enabled.eff_doubleHighestGold) pool.push(cloneFace(dieEffectPacks.find((p) => p.id === 'fortune').face));
+      if (enabled.eff_copyIngredient) pool.push(cloneFace(dieEffectPacks.find((p) => p.id === 'copycat').face));
+      if (enabled.eff_wildIngredient) pool.push(cloneFace(dieEffectPacks.find((p) => p.id === 'wild').face));
+      if (enabled.eff_boostGold) pool.push(cloneFace(dieEffectPacks.find((p) => p.id === 'greedy').face));
+      if (enabled.eff_score15) pool.push({ kind: 'effect', effect: 'scorePoints', amount: 15, label: 'Points +15', tag: 'effect' });
+      ingredients.forEach((ing) => {
+        if (enabled[`eff_doubleIng_${ing}`]) {
+          pool.push({ kind: 'effect', effect: 'doubleIngredient', ing, label: `Double ${ing} this roll`, tag: 'effect' });
+        }
+      });
+      if (enabled.blank) pool.push({ kind: 'blank', label: 'Void face', tag: 'blank' });
+      return pool.length ? pool : [{ kind: 'blank', label: 'Void face', tag: 'blank' }];
+    }
+
+    function makeFaceOffer() {
+      const pool = facePoolFromSettings();
+      const face = cloneFace(pick(pool));
+      return {
+        id: `face-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+        face,
+        cost: priceFace(face)
+      };
+    }
+
+    function sampleFaceOffers() {
+      const offers = [];
+      while (offers.length < 4) {
+        offers.push(makeFaceOffer());
+      }
+      return offers;
     }
 
     function chooseDieIndexForReplacement(newDieName) {
       if (!state.dice.length) return null;
       const options = state.dice.map((die, idx) => {
-        const type = diceCatalog.find((d) => d.id === die.typeId);
+        const type = getDieDef(die.typeId);
         return `${idx + 1}: ${type ? type.name : 'Unknown Die'}`;
       }).join('\n');
       const input = prompt(
@@ -1169,6 +1810,7 @@
     function refreshShopOffers() {
       state.shopOffers = sampleShopOffers();
       state.diceShopOffers = sampleDiceOffers();
+      state.faceShopOffers = sampleFaceOffers();
     }
 
     function closeStatsModal() {
@@ -1185,6 +1827,9 @@
     function renderInventory() {
       els.diceInventoryList.innerHTML = '';
       els.invGold.textContent = state.gold;
+      if (els.invDiceLabel) {
+        els.invDiceLabel.textContent = `${state.dice.length} / ${state.maxDice}`;
+      }
       if (!state.dice.length) {
         els.diceInventoryList.innerHTML = '<div class="empty">No dice owned.</div>';
         return;
@@ -1193,33 +1838,136 @@
       if (state.pendingDiePurchase) {
         const notice = document.createElement('div');
         notice.className = 'list-item';
-        notice.innerHTML = `<div><strong>Choose a die to replace</strong><div class="meta">Click any die below to swap for ${state.pendingDiePurchase.name}. <button id="cancelReplace" style="margin-left:8px;">Cancel</button></div></div>`;
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>Choose a die to replace</strong><div class="meta">Click any die below to swap for ${state.pendingDiePurchase.name}.</div>`;
+        const cancel = document.createElement('button');
+        cancel.textContent = 'Cancel';
+        cancel.onclick = () => { state.pendingDiePurchase = null; log('Die replacement cancelled.'); render(); };
+        notice.appendChild(text);
+        notice.appendChild(cancel);
         els.diceInventoryList.appendChild(notice);
-        setTimeout(() => {
-          const btn = document.getElementById('cancelReplace');
-          if (btn) btn.onclick = () => { state.pendingDiePurchase = null; log('Die replacement cancelled.'); render(); };
-        }, 0);
+      }
+
+      if (state.pendingDieEmpower) {
+        const notice = document.createElement('div');
+        notice.className = 'list-item';
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>Empower a die</strong><div class="meta">Click a die below: coins x${state.pendingDieEmpower.goldMult || 1}, ingredients x${state.pendingDieEmpower.ingMult || 1} (permanent).</div>`;
+        const cancel = document.createElement('button');
+        cancel.textContent = 'Cancel';
+        cancel.onclick = () => {
+          state.pendingDieEmpower = null;
+          log('Empower cancelled.');
+          render();
+        };
+        notice.appendChild(text);
+        notice.appendChild(cancel);
+        els.diceInventoryList.appendChild(notice);
+      }
+
+      if (state.pendingDieSacrifice) {
+        const notice = document.createElement('div');
+        notice.className = 'list-item';
+        const text = document.createElement('div');
+        text.innerHTML = '<strong>Sacrifice a die</strong><div class="meta">Click a die below to destroy it. Next roll: coins/ingredients doubled; lose 1 max die.</div>';
+        const cancel = document.createElement('button');
+        cancel.textContent = 'Cancel';
+        cancel.onclick = () => {
+          state.pendingDieSacrifice = null;
+          log('Sacrifice cancelled.');
+          render();
+        };
+        notice.appendChild(text);
+        notice.appendChild(cancel);
+        els.diceInventoryList.appendChild(notice);
+      }
+
+      if (state.pendingFacePurchase) {
+        const pending = state.pendingFacePurchase;
+        const notice = document.createElement('div');
+        notice.className = 'list-item';
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>Choose a face to replace</strong><div class="meta">Click any face below to swap in ${pending.face.label}.</div>`;
+        const cancel = document.createElement('button');
+        cancel.textContent = 'Cancel';
+        cancel.onclick = () => {
+          state.gold += pending.cost;
+          state.pendingFacePurchase = null;
+          log('Face swap cancelled and refunded.');
+          render();
+        };
+        notice.appendChild(text);
+        notice.appendChild(cancel);
+        els.diceInventoryList.appendChild(notice);
+      }
+
+      if (state.tokens.removeFace > 0) {
+        const notice = document.createElement('div');
+        notice.className = 'list-item';
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>Face removal tokens</strong><div class="meta">${state.tokens.removeFace} left · removes a face from a die (cannot remove the last face)</div>`;
+        const activate = document.createElement('button');
+        activate.textContent = state.pendingFaceRemoval ? 'Cancel remove' : 'Use token';
+        activate.onclick = () => {
+          if (state.pendingFaceRemoval) {
+            state.pendingFaceRemoval = false;
+            log('Face removal cancelled.');
+            render();
+            return;
+          }
+          state.pendingFaceRemoval = true;
+          log('Face removal ready: click a die face to remove it.');
+          render();
+        };
+        notice.appendChild(text);
+        notice.appendChild(activate);
+        els.diceInventoryList.appendChild(notice);
       }
 
       state.dice.forEach((die, index) => {
-        const type = diceCatalog.find((d) => d.id === die.typeId);
-        const faces = type ? type.faces : [];
+        const type = getDieDef(die.typeId);
+        const faces = getDieFaces(die);
+        const rarity = dieRarity(type, faces);
         const row = document.createElement('div');
-        row.className = 'list-item';
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
         if (state.pendingDiePurchase) {
           row.style.cursor = 'pointer';
           row.style.outline = '1px solid var(--accent)';
           row.title = 'Click to replace with new die';
           row.onclick = () => replaceDieAtIndex(index);
+        } else if (state.pendingDieEmpower) {
+          row.style.cursor = 'pointer';
+          row.style.outline = '1px solid var(--accent)';
+          row.title = 'Click to empower this die';
+          row.onclick = () => empowerDieAtIndex(index);
+        } else if (state.pendingDieSacrifice) {
+          row.style.cursor = 'pointer';
+          row.style.outline = '1px solid var(--danger)';
+          row.title = 'Click to sacrifice this die';
+          row.onclick = () => sacrificeDieAtIndex(index);
+        }
+        if (state.pendingFacePurchase || state.pendingFaceRemoval) {
+          row.style.outline = '1px solid var(--accent)';
         }
         const left = document.createElement('div');
         left.innerHTML = `<strong>${type ? type.name : 'Unknown Die'}</strong><div class="meta">Owned die #${index + 1}</div>`;
         const facesWrap = document.createElement('div');
         facesWrap.className = 'pill-row';
-        faces.forEach((f) => {
+        faces.forEach((f, faceIdx) => {
           const chip = document.createElement('span');
-          chip.className = 'face-chip';
+          chip.className = `face-chip ${faceRarityClass(f)}`.trim();
           chip.innerHTML = `<span class="mini-tag">${f.tag}</span>${f.label}`;
+          if (state.pendingFacePurchase) {
+            chip.style.cursor = 'pointer';
+            chip.style.outline = '1px solid var(--accent)';
+            chip.title = `Replace with ${state.pendingFacePurchase.face.label}`;
+            chip.onclick = (e) => { e.stopPropagation(); replaceFaceOnDie(index, faceIdx); };
+          } else if (state.pendingFaceRemoval) {
+            chip.style.cursor = 'pointer';
+            chip.style.outline = '1px solid var(--danger)';
+            chip.title = 'Remove this face (uses a token)';
+            chip.onclick = (e) => { e.stopPropagation(); removeFaceFromDie(index, faceIdx); };
+          }
           facesWrap.appendChild(chip);
         });
         row.appendChild(left);
@@ -1232,11 +1980,14 @@
       els.potionInventoryList.innerHTML = '';
       if (!state.potions.length) {
         els.potionInventoryList.innerHTML = '<div class="empty">No potions in inventory.</div>';
+        if (els.sellAllShop) els.sellAllShop.disabled = true;
         return;
       }
+      if (els.sellAllShop) els.sellAllShop.disabled = false;
       state.potions.forEach((p, idx) => {
         const item = document.createElement('div');
-        item.className = 'list-item';
+        const rarity = potionRarity(p);
+        item.className = `list-item ${rarityClass(rarity)}`.trim();
         const info = document.createElement('div');
         info.innerHTML = `<strong>${p.name}</strong><div class="meta">Sell ${p.sell} · Consume: ${p.consume.text}</div>`;
         const actions = document.createElement('div');
@@ -1244,8 +1995,10 @@
         const sell = document.createElement('button');
         sell.textContent = `Sell (+${p.sell})`;
         sell.onclick = () => {
-          state.gold += p.sell;
-          log(`Sold ${p.name} for ${p.sell} Gold.`);
+          const bonus = potionSellBonusForRound();
+          const total = p.sell + bonus;
+          gainGold(total);
+          log(`Sold ${p.name} for ${total} Gold${bonus ? ` (base ${p.sell} +${bonus})` : ''}.`);
           state.potions.splice(idx, 1);
           render();
         };
@@ -1278,19 +2031,23 @@
         if (state.tokens.reroll > 0) {
           const row = document.createElement('div');
           row.className = 'list-item';
-          row.innerHTML = `<div><strong>Reroll Tokens</strong><div class="meta">Count: ${state.tokens.reroll} (use in shop reroll)</div></div>`;
+          row.innerHTML = `<div><strong>Shop Reroll Tokens</strong><div class="meta">Count: ${state.tokens.reroll} (refreshes shop offers)</div></div>`;
           container.appendChild(row);
         }
         state.items.forEach((itm, idx) => {
           const row = document.createElement('div');
-          row.className = 'list-item';
+          const rarity = itm.rarity || itemRarity(itm);
+          row.className = `list-item ${rarityClass(rarity)}`.trim();
           row.innerHTML = `<div><strong>${itm.name}</strong><div class="meta">${itm.desc}</div></div>`;
           const btn = document.createElement('button');
           const rollOnly = inShop && itm.shopUsable === false;
+          const preRollLocked = !inShop && itm.preRollOnly && state.rolled;
           btn.textContent = rollOnly ? 'Use (roll only)' : 'Use';
-          btn.disabled = rollOnly;
+          btn.disabled = rollOnly || preRollLocked;
           if (rollOnly) {
             btn.title = 'Use this during the roll/cauldron phase so it is not wasted.';
+          } else if (preRollLocked) {
+            btn.title = 'Use before rolling.';
           } else {
             btn.onclick = () => {
               const result = itm.action(state);
@@ -1319,19 +2076,156 @@
           }
           break;
         }
+        case 'score': {
+          const amt = effect.amount !== undefined ? effect.amount : 0;
+          state.stats.score += amt;
+          log(`Gained ${amt} point${amt === 1 ? '' : 's'}.`);
+          render();
+          break;
+        }
         case 'gold':
-          state.gold += effect.gold;
+          gainGold(effect.gold);
           break;
         case 'reroll':
-          state.tokens.reroll += effect.rerolls;
+          addRerollTokens(effect.rerolls);
+          break;
+        case 'removeFaceToken':
+          if (effect.tokens) {
+            state.tokens.removeFace = Math.max(0, state.tokens.removeFace) + effect.tokens;
+            log(`Gained ${effect.tokens} face-removal token${effect.tokens > 1 ? 's' : ''}.`);
+            render();
+          }
           break;
         case 'shield': {
           if (effect.shields) {
             state.statuses.push({ type: 'shield', amount: effect.shields, expires: effectTargetRound() });
           }
           if (effect.gold) {
-            state.gold += effect.gold;
+            gainGold(effect.gold);
           }
+          break;
+        }
+        case 'ingToGold': {
+          const per = effect.goldPerIng !== undefined ? effect.goldPerIng : 6;
+          state.statuses.push({ type: 'ingToGold', amount: per, expires: effectTargetRound() });
+          log(`Next roll: each ingredient converts to ${per} Gold.`);
+          break;
+        }
+        case 'goldToIngredient': {
+          state.statuses.push({ type: 'goldToIngredient', expires: effectTargetRound() });
+          log('Next roll: each coin becomes a random ingredient.');
+          break;
+        }
+        case 'dieReroll': {
+          const amt = effect.amount !== undefined ? effect.amount : 1;
+          state.statuses.push({ type: 'dieRerollToken', amount: amt, expires: effectTargetRound() });
+          log(`Stored ${amt} die reroll${amt === 1 ? '' : 's'} for the target round. Roll, then click a die to reroll${amt === 1 ? '' : ' up to ' + amt + ' times'}.`);
+          break;
+        }
+        case 'duplicateDiceLoseRound': {
+          const clones = state.dice.map((d) => cloneDie(d)).filter(Boolean);
+          state.statuses.push({ type: 'duplicateDice', clones, expires: effectTargetRound() });
+          const newMax = Math.max(state.round, state.maxRounds - 1);
+          const lost = state.maxRounds - newMax;
+          state.maxRounds = newMax;
+          log(`Next roll will include duplicates of all dice. Lost ${lost} round${lost === 1 ? '' : 's'} (max now ${state.maxRounds}).`);
+          break;
+        }
+        case 'potionSellBonus': {
+          const amount = effect.amount !== undefined ? effect.amount : 0;
+          state.statuses.push({ type: 'potionSellBonus', amount, expires: effectTargetRound() });
+          log(`Next round: potions sell for +${amount} Gold.`);
+          break;
+        }
+        case 'unusedIngGold': {
+          const amount = effect.amount !== undefined ? effect.amount : 30;
+          const ings = Array.isArray(effect.ings) && effect.ings.length ? effect.ings : ingredients;
+          state.statuses.push({ type: 'unusedIngGold', amount, ings: [...ings], expires: effectTargetRound() });
+          log(`Next round: gain ${amount} Gold per unused ${ings.join('/')} left in inventory.`);
+          break;
+        }
+        case 'ingredientMultiplier': {
+          const mult = effect.multiplier && effect.multiplier > 0 ? effect.multiplier : 1;
+          state.statuses.push({ type: 'ingredientMultiplier', ing: effect.ing, multiplier: mult });
+          log(`Permanent: ${effect.ing || 'Ingredients'} count x${mult}.`);
+          break;
+        }
+        case 'extendMaxRounds': {
+          const amt = effect.amount !== undefined ? effect.amount : 1;
+          const before = state.maxRounds;
+          state.maxRounds = Math.min(99, state.maxRounds + amt);
+          const gained = state.maxRounds - before;
+          log(gained > 0
+            ? `Run extended by ${gained} round${gained === 1 ? '' : 's'} (max rounds now ${state.maxRounds}).`
+            : 'Run length unchanged (already at cap).');
+          break;
+        }
+        case 'sacrificeDoubleRoll': {
+          const expires = effectTargetRound();
+          state.pendingDieSacrifice = { expires };
+          log('Select a die to sacrifice. Next roll: coins and ingredients doubled; max dice -1.');
+          render();
+          break;
+        }
+        case 'convertIngredients': {
+          const from = effect.from || 'toxin';
+          const to = effect.to || 'essence';
+          const mult = effect.multiplier && effect.multiplier > 0 ? effect.multiplier : 1;
+          state.statuses.push({ type: 'convertIngredient', from, to, multiplier: mult, expires: effectTargetRound() });
+          log(`Next roll: each ${from} becomes ${mult} ${to}.`);
+          break;
+        }
+        case 'addDieSlot': {
+          const before = state.maxDice;
+          state.maxDice = Math.min(9, state.maxDice + 1);
+          const gained = state.maxDice - before;
+          log(gained > 0 ? `Max dice increased by ${gained} (now ${state.maxDice}).` : 'Max dice already at cap.');
+          render();
+          break;
+        }
+        case 'randomShopItems': {
+          ensureToggleDefaults();
+          const pool = shopStock.filter((i) => settings.enabledItems ? settings.enabledItems[i.id] !== false : true);
+          if (!pool.length) {
+            log('No shop items available to grant.');
+            break;
+          }
+          const count = effect.count && effect.count > 0 ? Math.floor(effect.count) : 2;
+          const picks = shuffle(pool).slice(0, count);
+          const messages = [];
+          const names = [];
+          picks.forEach((itm) => {
+            const msg = grantShopItem(itm);
+            if (msg) messages.push(msg);
+            names.push(itm.name);
+          });
+          if (names.length) {
+            log(`Smokestack Veil granted: ${names.join(', ')}.`);
+          }
+          messages.forEach((m) => log(m));
+          break;
+        }
+        case 'passiveGoldPerRound': {
+          const amount = effect.amount !== undefined ? effect.amount : 4;
+          state.statuses.push({ type: 'passiveRoundGold', amount });
+          log(`Passive unlocked: +${amount} Gold at the start of each remaining round.`);
+          break;
+        }
+        case 'delayedIngredients': {
+          if (effect.ingredients && effect.ingredients.length) {
+            state.statuses.push({ type: 'delayedIngredients', ings: [...effect.ingredients], expires: effectTargetRound() });
+            log(`Will gain ${effect.ingredients.join(' + ')} on the next roll.`);
+          }
+          break;
+        }
+        case 'cloneDie': {
+          if (!state.dice.length) { log('No dice to copy.'); break; }
+          const source = pick(state.dice);
+          const def = getDieDef(source.typeId);
+          const cloned = cloneDie(source);
+          if (!cloned) { log('Failed to copy die.'); break; }
+          state.statuses.push({ type: 'bonusCloneDie', die: cloned, name: def ? def.name : 'a die', expires: effectTargetRound() });
+          log(`A bonus copy of ${def ? def.name : 'a die'} will roll next.`);
           break;
         }
         case 'boost':
@@ -1340,9 +2234,29 @@
             state.statuses.push({ type: 'perDieGold', amount: effect.perDie, expires: effectTargetRound() });
           }
           if (effect.gold) {
-            state.gold += effect.gold;
+            gainGold(effect.gold);
           }
           break;
+        case 'empowerDie': {
+          const goldMult = effect.goldMult && effect.goldMult > 0 ? effect.goldMult : 1;
+          const ingMult = effect.ingMult && effect.ingMult > 0 ? effect.ingMult : 1;
+          state.pendingDieEmpower = { goldMult, ingMult };
+          log(`Select a die to empower: coins x${goldMult}, ingredients x${ingMult} (permanent).`);
+          render();
+          break;
+        }
+        case 'coinFlipJackpot': {
+          const win = Math.random() < 0.5;
+          if (win) {
+            const amt = effect.gold !== undefined ? effect.gold : 100;
+            gainGold(amt);
+            log(`Lucky coin flip: +${amt} Gold.`);
+          } else {
+            log('The toxin backfires: your run ends immediately.');
+            endGame();
+          }
+          break;
+        }
         default:
           break;
       }
@@ -1350,11 +2264,17 @@
 
     function renderShop() {
       els.shopList.innerHTML = '';
+      if (els.rerollShop) {
+        const left = state.shopRerollsLeft !== undefined ? state.shopRerollsLeft : 0;
+        els.rerollShop.textContent = `Reroll Shop (-3 Gold or 1 token) · ${left} left`;
+      }
       const offers = Array.isArray(state.shopOffers) ? state.shopOffers : shopStock;
       offers.forEach((item) => {
         const row = document.createElement('div');
-        row.className = 'list-item';
-        row.innerHTML = `<div><strong>${item.name}</strong><div class="meta">Cost: ${item.cost} · ${item.desc}</div></div>`;
+        const rarity = itemRarity(item);
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
+        const label = item.permanent ? 'Permanent' : (item.consumable ? 'Consumable' : 'Immediate');
+        row.innerHTML = `<div><strong>${item.name}</strong><div class="meta">Cost: ${item.cost} · ${item.desc} <span class="tag effect" style="margin-left:6px;">${label}</span></div></div>`;
         const btn = document.createElement('button');
         btn.textContent = 'Buy';
         btn.onclick = () => {
@@ -1371,7 +2291,9 @@
               name: item.name,
               desc: item.desc,
               action: item.action,
-              shopUsable: item.shopUsable !== false
+              shopUsable: item.shopUsable !== false,
+              preRollOnly: !!item.preRollOnly,
+              rarity
             });
             recordItemBought();
             log(`Added ${item.name} to inventory.`);
@@ -1411,29 +2333,31 @@
           els.diceShopList.appendChild(emptyRow);
           return;
         }
+        const rarity = dieRarity(dieType, dieType.faces);
+        const cost = dieShopCost(dieType);
         const row = document.createElement('div');
-        row.className = 'list-item';
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
         const facesWrap = document.createElement('div');
         facesWrap.className = 'pill-row';
         dieType.faces.forEach((f) => {
           const chip = document.createElement('span');
-          chip.className = 'face-chip';
+          chip.className = `face-chip ${faceRarityClass(f, dieType.price)}`.trim();
           chip.innerHTML = `<span class="mini-tag">${f.tag}</span>${f.label}`;
           facesWrap.appendChild(chip);
         });
         const info = document.createElement('div');
-        info.innerHTML = `<strong>${dieType.name}</strong><div class="meta">Cost: ${dieType.price}</div>`;
+        info.innerHTML = `<strong>${dieType.name}</strong><div class="meta">Cost: ${cost}</div>`;
         const btn = document.createElement('button');
         btn.textContent = 'Buy Die';
         btn.onclick = () => {
-          if (state.gold < dieType.price) { log('Not enough gold.'); return; }
+          if (state.gold < cost) { log('Not enough gold.'); return; }
           if (state.dice.length >= state.maxDice) {
-            state.pendingDiePurchase = { typeId: dieType.id, name: dieType.name, cost: dieType.price, offerIndex: idx };
+            state.pendingDiePurchase = { typeId: dieType.id, name: dieType.name, cost, offerIndex: idx };
             log(`Select a die to replace with ${dieType.name}. Click a die below.`);
             render();
             return;
           }
-          state.gold -= dieType.price;
+          state.gold -= cost;
           state.dice.push(makeDie(dieType.id));
           recordItemBought();
           log(`Bought ${dieType.name}.`);
@@ -1449,10 +2373,50 @@
       });
     }
 
+    function renderFaceShop() {
+      els.faceShopList.innerHTML = '';
+      const offers = state.faceShopOffers && state.faceShopOffers.length
+        ? state.faceShopOffers
+        : sampleFaceOffers();
+      offers.forEach((offer, idx) => {
+        const row = document.createElement('div');
+        const rarity = offer ? faceRarity(offer.face, offer.cost) : 'common';
+        row.className = `list-item ${rarityClass(rarity)}`.trim();
+        if (!offer) {
+          row.innerHTML = '<div><strong>Empty slot</strong><div class="meta">Reroll the shop to refresh face offers.</div></div>';
+          els.faceShopList.appendChild(row);
+          return;
+        }
+        const faceChip = document.createElement('span');
+        faceChip.className = `face-chip ${faceRarityClass(offer.face, offer.cost)}`.trim();
+        faceChip.innerHTML = `<span class="mini-tag">${offer.face.tag}</span>${offer.face.label}`;
+        const info = document.createElement('div');
+        info.innerHTML = `<strong>${offer.face.label}</strong><div class="meta">Cost: ${offer.cost}</div>`;
+        const btn = document.createElement('button');
+        btn.textContent = 'Buy Face';
+        btn.onclick = () => {
+          if (state.pendingFacePurchase) { log('Finish your current face swap first.'); return; }
+          if (state.gold < offer.cost) { log('Not enough gold.'); return; }
+          state.gold -= offer.cost;
+          state.pendingFacePurchase = { face: cloneFace(offer.face), cost: offer.cost, offerIndex: idx };
+          recordItemBought();
+          log(`Bought a die face: ${offer.face.label}. Click a die face to replace it.`);
+          if (state.faceShopOffers) {
+            state.faceShopOffers[idx] = null;
+          }
+          render();
+        };
+        row.appendChild(info);
+        row.appendChild(faceChip);
+        row.appendChild(btn);
+        els.faceShopList.appendChild(row);
+      });
+    }
+
     function renderStatuses() {
       els.statusRow.innerHTML = '';
       const active = state.statuses;
-      if (!active.length && state.tokens.reroll === 0) {
+      if (!active.length && state.tokens.reroll === 0 && !state.pendingDieReroll && !state.pendingFacePurchase && !state.pendingFaceRemoval && !state.pendingDieSacrifice && !state.pendingDieEmpower && (state.tokens.removeFace || 0) === 0) {
         els.statusRow.innerHTML = '<div class="empty">No active effects.</div>';
         return;
       }
@@ -1461,14 +2425,43 @@
         perDieGold: (s) => `+${s.amount} Gold per die`,
         shield: () => 'Toxin shield',
         goldDoubler: () => 'Gold gains doubled',
-        doubleIng: (s) => `Double ${s.ing} gains`,
+        goldFaceBonus: (s) => `+${s.amount} Gold on each gold face`,
+        uniqueGoldBonus: (s) => `+${s.amount} Gold per unique ingredient`,
+        doubleIng: (s) => {
+          const extra = s.gained ? ` (+${s.gained})` : '';
+          return `Double ${s.ing} gains${extra}`;
+        },
+        bonusCloneDie: (s) => `Bonus copy: ${s.name || 'die'}`,
+        delayedIngredients: (s) => `Delayed: ${Array.isArray(s.ings) ? s.ings.join(' + ') : 'ingredients'}`,
+        passiveRoundGold: (s) => `Permanent: +${s.amount || 0} Gold each round`,
+        convertIngredient: (s) => `Convert ${s.from || '?'} → ${s.multiplier || 1}×${s.to || '?'}`,
+        ingToGold: (s) => `Ingredients → ${s.amount || 0} Gold`,
+        goldToIngredient: () => 'Coins → random ingredients',
+        doubleCoinIng: () => 'Coins/ingredients x2',
+        unusedIngGold: (s) => {
+          const names = Array.isArray(s.ings) && s.ings.length ? s.ings.join('/') : 'ingredients';
+          return `Unused ${names} → +${s.amount || 0} Gold`;
+        },
+        firstIngDoubler: (s) => `Permanent: first ${s.ing || 'ingredient'} doubled each round`,
+        dieMod: (s) => `Die buff: coins x${s.goldMult || 1}, ingredients x${s.ingMult || 1}`,
+        goldMultiplier: (s) => `Gold faces x${s.amount || 1} (R${s.expires || state.round})`,
+        ingredientMultiplier: (s) => `Permanent: ${s.ing || 'Ingredients'} x${s.multiplier || 1}`,
+        duplicateDice: () => 'Next roll: duplicate all dice',
+        potionSellBonus: (s) => `Potions sell +${s.amount || 0} (R${s.expires || state.round})`,
+        dieRerollToken: (s) => `Die rerolls stored: ${s.amount || 1}`,
+        excessGoldDouble: (s) => `Permanent: Gold over ${s.threshold || 5} doubled`,
+        cheapShopReroll: (s) => `Permanent: Shop rerolls cost ${s.cost !== undefined ? s.cost : 3}`,
+        passiveGoldOnGold: (s) => `Permanent: +${s.amount} Gold on gold faces`,
+        passiveManaFloor: () => 'Permanent: Gain 1 Mana if none rolled',
+        passiveGoldFloor: (s) => `Permanent: Raise low gold to ${s.floor || 5}`,
+        character: (s) => `Character: ${s.name || 'Unknown'}`,
         pendingReroll: () => 'Select a die to reroll'
       };
       active.forEach((s) => {
         const span = document.createElement('span');
         span.className = 'tag effect';
         const labelFn = labels[s.type];
-        const roundTag = s.expires ? ` · R${s.expires}` : '';
+        const roundTag = s.expires ? ` · R${s.expires}` : ' · Permanent';
         span.textContent = labelFn ? `${labelFn(s)}${roundTag}` : `${s.type} (${s.amount || ''})${roundTag}`;
         els.statusRow.appendChild(span);
       });
@@ -1478,10 +2471,40 @@
         span.textContent = 'Click a die to reroll';
         els.statusRow.appendChild(span);
       }
+      if (state.pendingDieSacrifice) {
+        const span = document.createElement('span');
+        span.className = 'tag effect';
+        span.textContent = 'Select a die to sacrifice';
+        els.statusRow.appendChild(span);
+      }
+      if (state.pendingDieEmpower) {
+        const span = document.createElement('span');
+        span.className = 'tag effect';
+        span.textContent = 'Select a die to empower';
+        els.statusRow.appendChild(span);
+      }
+      if (state.pendingFacePurchase) {
+        const span = document.createElement('span');
+        span.className = 'tag effect';
+        span.textContent = `Face ready: ${state.pendingFacePurchase.face.label}`;
+        els.statusRow.appendChild(span);
+      }
       if (state.tokens.reroll > 0) {
         const span = document.createElement('span');
         span.className = 'tag effect';
-        span.textContent = `Reroll tokens: ${state.tokens.reroll}`;
+        span.textContent = `Shop reroll tokens: ${state.tokens.reroll}`;
+        els.statusRow.appendChild(span);
+      }
+      if ((state.tokens.removeFace || 0) > 0) {
+        const span = document.createElement('span');
+        span.className = 'tag effect';
+        span.textContent = `Face removal tokens: ${state.tokens.removeFace}`;
+        els.statusRow.appendChild(span);
+      }
+      if (state.pendingFaceRemoval) {
+        const span = document.createElement('span');
+        span.className = 'tag effect';
+        span.textContent = 'Face removal active: click a die face to remove it';
         els.statusRow.appendChild(span);
       }
     }
@@ -1489,8 +2512,8 @@
     function renderHeader() {
       els.roundLabel.textContent = `${state.round} / ${state.maxRounds}`;
       els.goldLabel.textContent = state.gold;
-      els.diceLabel.textContent = `${state.dice.length} / ${state.maxDice}`;
-      els.potionCount.textContent = state.potions.length;
+      if (els.scoreLabel) els.scoreLabel.textContent = state.stats.score;
+      if (els.invDiceLabel) els.invDiceLabel.textContent = `${state.dice.length} / ${state.maxDice}`;
       const progress = ((state.round - 1) / state.maxRounds) * 100;
       els.progressBar.style.width = `${progress}%`;
     }
@@ -1502,7 +2525,16 @@
       if (doublers.length) {
         state.ingredients.push(ing);
         if (state.stats.ingredients[ing] !== undefined) state.stats.ingredients[ing] += 1;
+        doublers.forEach((d) => { d.gained = (d.gained || 0) + 1; });
         log(`Ingredient doubled: gained extra ${ing}.`);
+      }
+      const multipliers = state.statuses.filter((s) => s.type === 'ingredientMultiplier' && (!s.ing || s.ing === ing));
+      if (multipliers.length) {
+        const extra = multipliers.reduce((sum, m) => sum + Math.max(0, (m.multiplier || 1) - 1), 0);
+        for (let i = 0; i < extra; i += 1) {
+          state.ingredients.push(ing);
+          if (state.stats.ingredients[ing] !== undefined) state.stats.ingredients[ing] += 1;
+        }
       }
     }
 
@@ -1515,33 +2547,114 @@
       state.gold = snap.gold;
       state.ingredients = [...snap.ingredients];
       state.stats.ingredients = { ...snap.statsIngredients };
+      state.stats.score = snap.score;
 
       const totalDice = rolls.length;
       const goldBefore = state.gold;
       const hasGoldDoubler = state.statuses.some((s) => s.type === 'goldDoubler' && s.expires === state.round);
+      const goldFaceBonus = goldFaceBonusForRoll();
+      const uniqueGoldBonus = state.statuses
+        .filter((s) => s.type === 'uniqueGoldBonus' && s.expires === state.round)
+        .reduce((sum, s) => sum + s.amount, 0);
       const summary = { ingredients: [], goldFaces: [], effects: [] };
+
+      let convertedCoinTotal = 0;
+
+      const goldToIngActive = state.statuses.some((s) => s.type === 'goldToIngredient' && s.expires === state.round);
+      const doubleCoinIngActive = state.statuses.some((s) => s.type === 'doubleCoinIng' && s.expires === state.round);
+
+      const delayed = takeDelayedIngredientsForRound();
+      if (delayed.length) {
+        delayed.forEach((ing) => summary.ingredients.push(ing));
+        log(`Delayed ingredients granted: ${delayed.join(' + ')}.`);
+      }
 
       rolls.forEach((entry) => {
         const { face } = entry;
-        if (face.kind === 'ingredient') summary.ingredients.push(face.ingredient);
-        if (face.kind === 'gold') { summary.goldFaces.push(face.gold); state.gold += face.gold; }
+        const mods = dieModifiers(entry.die);
+        const dieGoldMult = mods.reduce((prod, m) => prod * (m.goldMult || 1), 1);
+        const dieIngMult = mods.reduce((prod, m) => prod * (m.ingMult || 1), 1);
+        if (face.kind === 'ingredient') {
+          const count = Math.max(1, Math.round((doubleCoinIngActive ? 2 : 1) * (dieIngMult || 1)));
+          for (let c = 0; c < count; c += 1) summary.ingredients.push(face.ingredient);
+          const firstDoubler = state.statuses.find((s) => s.type === 'firstIngDoubler' && s.ing === face.ingredient && s.usedAtRound !== state.round);
+          if (firstDoubler) {
+            summary.ingredients.push(face.ingredient);
+            firstDoubler.usedAtRound = state.round;
+            log(`First ${face.ingredient} doubled (Sigil).`);
+          }
+        }
+        if (face.kind === 'gold') {
+          const totalGold = face.gold + goldFaceBonus;
+          const goldMult = state.statuses
+            .filter((s) => s.type === 'goldMultiplier' && s.expires === state.round)
+            .reduce((prod, s) => prod * (s.amount || 1), 1);
+          const finalGold = Math.round(totalGold * (goldMult || 1) * (dieGoldMult || 1));
+          const coinCount = doubleCoinIngActive ? finalGold * 2 : finalGold;
+          if (goldToIngActive) {
+            for (let g = 0; g < coinCount; g += 1) {
+              summary.ingredients.push(pick(ingredients));
+            }
+            convertedCoinTotal += coinCount;
+            summary.goldFaces.push(0);
+          } else {
+            summary.goldFaces.push(coinCount);
+            gainGold(coinCount);
+          }
+        }
         if (face.kind === 'effect') summary.effects.push(face.effect);
       });
+
+      if (goldToIngActive) {
+        const convertedCoins = convertedCoinTotal;
+        const added = summary.ingredients.length - delayed.length - rolls.filter((r) => r.face.kind === 'ingredient').reduce((sum, r) => sum + (doubleCoinIngActive ? 2 : 1), 0);
+        if (added > 0) {
+          log(`Converted ${convertedCoins} coin${convertedCoins === 1 ? '' : 's'} into random ingredients.`);
+        }
+      }
 
       const perDieBonus = state.statuses.filter((s) => s.type === 'perDieGold' && s.expires === state.round)
         .reduce((sum, s) => sum + s.amount, 0);
       if (perDieBonus) {
         const gain = perDieBonus * totalDice;
-        state.gold += gain;
+        gainGold(gain);
         log(`Boost: +${gain} Gold from per-die bonus.`);
       }
 
       applyEffects(rolls, summary);
+
+      summary.ingredients = convertIngredientsForRound(summary.ingredients);
+      convertIngredientsToGold(summary);
+
+      const addManaSafety = state.statuses.some((s) => s.type === 'passiveManaFloor');
+      if (addManaSafety && !summary.ingredients.includes('mana')) {
+        summary.ingredients.push('mana');
+        log('Passive: gained 1 Mana (none rolled).');
+      }
+
+      if (uniqueGoldBonus && summary.ingredients.length) {
+        const uniqueCount = new Set(summary.ingredients).size;
+        const gain = uniqueGoldBonus * uniqueCount;
+        gainGold(gain);
+        log(`Unique bonus: +${gain} Gold from ${uniqueCount} unique ingredients.`);
+      }
       summary.ingredients.forEach((ing) => recordIngredient(ing));
+      const floorTarget = passiveGoldFloorValue();
+      if (floorTarget) {
+        const floorEffect = state.statuses.find((s) => s.type === 'passiveGoldFloor');
+        const threshold = floorEffect && floorEffect.threshold !== undefined ? floorEffect.threshold : 3;
+        const gained = state.gold - goldBefore;
+        if (gained <= threshold && gained < floorTarget) {
+          const add = floorTarget - gained;
+          gainGold(add);
+          log(`Passive: raised Gold gain to ${floorTarget} (+${add}).`);
+        }
+      }
+      applyExcessGoldBonus(goldBefore);
       if (hasGoldDoubler) {
         const gained = state.gold - goldBefore;
         if (gained > 0) {
-          state.gold += gained;
+          gainGold(gained);
           log(`Gold Doubler: +${gained} extra Gold.`);
         }
       }
@@ -1552,7 +2665,7 @@
     }
 
     async function rerollDieAt(idx) {
-      if (!state.pendingDieReroll) return;
+      if (!state.pendingDieReroll || (state.dieRerollsLeft || 0) <= 0) return;
       if (!state.currentRolls || !state.currentRolls.length) {
         log('No dice to reroll.');
         state.pendingDieReroll = false;
@@ -1562,10 +2675,48 @@
       if (!target) { log('No die in that slot.'); return; }
       const newFace = rollDie(target.die);
       const newRolls = state.currentRolls.map((r, i) => (i === idx ? { die: r.die, face: newFace } : r));
-      state.pendingDieReroll = false;
-      log(`Rerolled die ${idx + 1}.`);
+      state.dieRerollsLeft -= 1;
+      if (state.dieRerollsLeft <= 0) {
+        state.pendingDieReroll = false;
+        state.dieRerollsLeft = 0;
+      }
+      log(`Rerolled die ${idx + 1}. (${state.dieRerollsLeft || 0} left)`);
       await animateSingleDie(idx, newRolls, state.currentRolls);
       applyRollFaces(newRolls);
+    }
+
+    function replaceFaceOnDie(dieIdx, faceIdx) {
+      const pending = state.pendingFacePurchase;
+      if (!pending) return;
+      const die = state.dice[dieIdx];
+      if (!die) { log('No die in that slot.'); return; }
+      const faces = cloneFaces(getDieFaces(die));
+      if (!faces[faceIdx]) { log('No face in that slot.'); return; }
+      faces[faceIdx] = cloneFace(pending.face);
+      die.faces = faces;
+      state.pendingFacePurchase = null;
+      const dieDef = getDieDef(die.typeId);
+      const dieName = dieDef ? dieDef.name : 'a die';
+      log(`Replaced a face on ${dieName} with ${pending.face.label}.`);
+      render();
+    }
+
+    function removeFaceFromDie(dieIdx, faceIdx) {
+      if (!state.pendingFaceRemoval) return;
+      const die = state.dice[dieIdx];
+      if (!die) { log('No die in that slot.'); return; }
+      const faces = [...getDieFaces(die)];
+      if (!faces[faceIdx]) { log('No face in that slot.'); return; }
+      if (faces.length <= 1) { log('Cannot remove the last face from a die.'); return; }
+      if ((state.tokens.removeFace || 0) <= 0) { log('No face-removal tokens left.'); state.pendingFaceRemoval = false; render(); return; }
+      faces.splice(faceIdx, 1);
+      die.faces = faces;
+      state.tokens.removeFace -= 1;
+      if (state.tokens.removeFace <= 0) {
+        state.pendingFaceRemoval = false;
+      }
+      log(`Removed a face. ${state.tokens.removeFace} face-removal token${state.tokens.removeFace === 1 ? '' : 's'} left.`);
+      render();
     }
 
     function replaceDieAtIndex(idx) {
@@ -1576,12 +2727,43 @@
       state.dice.splice(idx, 0, makeDie(pending.typeId));
       state.gold -= pending.cost;
       recordItemBought();
-      const removedType = diceCatalog.find((d) => d.id === removed.typeId);
+      const removedType = getDieDef(removed.typeId);
       log(`Replaced ${removedType ? removedType.name : 'a die'} with ${pending.name}.`);
       if (state.diceShopOffers && pending.offerIndex !== undefined) {
         state.diceShopOffers[pending.offerIndex] = null;
       }
       state.pendingDiePurchase = null;
+      render();
+    }
+
+    function sacrificeDieAtIndex(idx) {
+      const pending = state.pendingDieSacrifice;
+      if (!pending) return;
+      if (!state.dice[idx]) { log('No die in that slot.'); return; }
+      const removed = state.dice.splice(idx, 1)[0];
+      const def = getDieDef(removed.typeId);
+      state.maxDice = Math.max(1, state.maxDice - 1);
+      state.statuses.push({ type: 'doubleCoinIng', expires: pending.expires || effectTargetRound() });
+      state.pendingDieSacrifice = null;
+      log(`Sacrificed ${def ? def.name : 'a die'}. Next roll: coins and ingredients doubled. Max dice now ${state.maxDice}.`);
+      render();
+    }
+
+    function empowerDieAtIndex(idx) {
+      const pending = state.pendingDieEmpower;
+      if (!pending) return;
+      const die = state.dice[idx];
+      if (!die) { log('No die in that slot.'); return; }
+      state.statuses.push({
+        type: 'dieMod',
+        dieId: die.id,
+        goldMult: pending.goldMult || 1,
+        ingMult: pending.ingMult || 1,
+        name: 'Plaguefire Bulwark'
+      });
+      state.pendingDieEmpower = null;
+      const def = getDieDef(die.typeId);
+      log(`Empowered ${def ? def.name : 'a die'}: coins x${pending.goldMult || 1}, ingredients x${pending.ingMult || 1} (permanent).`);
       render();
     }
 
@@ -1604,6 +2786,7 @@
       lifetimeStats.potionsConsumed += state.stats.potionsConsumed;
       lifetimeStats.potionValue += state.stats.potionValue;
       lifetimeStats.itemsBought += state.stats.itemsBought;
+      lifetimeStats.highScore = Math.max(lifetimeStats.highScore, state.stats.score || 0);
       ingredients.forEach((ing) => {
         lifetimeStats.ingredients[ing] += state.stats.ingredients[ing] || 0;
       });
@@ -1622,10 +2805,31 @@
       renderInventoryPotions();
       renderInventoryItems();
       renderDiceShop();
+      renderFaceShop();
       renderStatuses();
     }
 
     function startRound() {
+      if (state.pendingDieSacrifice && state.pendingDieSacrifice.expires && state.pendingDieSacrifice.expires < state.round) {
+        state.pendingDieSacrifice = null;
+      }
+      state.stage = 'roll';
+      state.shopRerollsLeft = 3;
+      const unusedGoldStatuses = state.statuses.filter((s) => s.type === 'unusedIngGold' && s.expires === state.round);
+      if (unusedGoldStatuses.length) {
+        unusedGoldStatuses.forEach((s) => {
+          const allowed = new Set(Array.isArray(s.ings) && s.ings.length ? s.ings : ingredients);
+          const count = state.ingredients.filter((ing) => allowed.has(ing)).length;
+          const gain = count * (s.amount || 0);
+          if (gain > 0) {
+            gainGold(gain);
+            log(`Hellfire Panacea: +${gain} Gold from ${count} unused ingredient${count === 1 ? '' : 's'}.`);
+          } else {
+            log('Hellfire Panacea: no unused ingredients to convert.');
+          }
+        });
+        state.statuses = state.statuses.filter((s) => !(s.type === 'unusedIngGold' && s.expires === state.round));
+      }
       state.ingredients = [];
       state.cauldron = [];
       state.rolled = false;
@@ -1634,6 +2838,7 @@
       state.pendingDieReroll = false;
       state.pendingDiePurchase = null;
       refreshShopOffers();
+      grantPassiveRoundGold();
       setView('roll');
       log(`Round ${state.round} start.`);
       renderDice([]);
@@ -1643,7 +2848,7 @@
 
     function finishRound() {
       state.round += 1;
-      state.statuses = state.statuses.filter((s) => s.expires && s.expires >= state.round);
+      state.statuses = state.statuses.filter((s) => s.expires === undefined || s.expires >= state.round);
       if (state.round > state.maxRounds) {
         els.rollBtn.disabled = true;
         log('Game over. Thanks for playing!');
@@ -1660,11 +2865,98 @@
       openStatsModal(lastRunStats, false);
     }
 
+    function grantPassiveRoundGold() {
+      const gain = state.statuses
+        .filter((s) => s.type === 'passiveRoundGold')
+        .reduce((sum, s) => sum + (s.amount || 0), 0);
+      if (gain > 0) {
+        gainGold(gain);
+        log(`Passive income: +${gain} Gold for this round.`);
+      }
+    }
+
     function computeBonusDice() {
-      const bonus = state.statuses
+      const generic = state.statuses
         .filter((s) => s.type === 'bonusDice' && s.expires === state.round)
         .reduce((sum, s) => sum + s.amount, 0);
-      return bonus;
+      const clones = state.statuses
+        .filter((s) => s.type === 'bonusCloneDie' && s.expires === state.round)
+        .map((s) => s.die)
+        .filter(Boolean);
+      return { generic, clones };
+    }
+
+    function duplicateDiceForRound() {
+      const status = state.statuses.find((s) => s.type === 'duplicateDice' && s.expires === state.round);
+      if (!status || !status.clones) return [];
+      return status.clones;
+    }
+
+    function goldFaceBonusForRoll() {
+      const temp = state.statuses
+        .filter((s) => s.type === 'goldFaceBonus' && s.expires === state.round)
+        .reduce((sum, s) => sum + s.amount, 0);
+      const passive = state.statuses
+        .filter((s) => s.type === 'passiveGoldOnGold')
+        .reduce((sum, s) => sum + (s.amount || 0), 0);
+      return temp + passive;
+    }
+
+    function passiveGoldFloorValue() {
+      return state.statuses
+        .filter((s) => s.type === 'passiveGoldFloor')
+        .reduce((max, s) => Math.max(max, s.floor || 0), 0);
+    }
+
+    function takeDelayedIngredientsForRound() {
+      const out = [];
+      state.statuses = state.statuses.filter((s) => {
+        if (s.type === 'delayedIngredients' && s.expires === state.round) {
+          if (Array.isArray(s.ings)) out.push(...s.ings);
+          return false; // consume once
+        }
+        return true;
+      });
+      return out;
+    }
+
+    function convertIngredientsForRound(ings) {
+      if (!ings || !ings.length) return ings;
+      const converters = state.statuses.filter((s) => s.type === 'convertIngredient' && s.expires === state.round);
+      if (!converters.length) return ings;
+      const out = [];
+      const counts = {};
+      ings.forEach((ing) => {
+        let replaced = false;
+        converters.forEach((c) => {
+          if (c.from === ing) {
+            const mult = c.multiplier && c.multiplier > 0 ? c.multiplier : 1;
+            for (let i = 0; i < mult; i += 1) out.push(c.to || ing);
+            counts[ing] = (counts[ing] || 0) + 1;
+            replaced = true;
+          }
+        });
+        if (!replaced) out.push(ing);
+      });
+      const parts = Object.entries(counts).map(([k, v]) => `${v} ${k}`);
+      if (parts.length) {
+        log(`Converted ${parts.join(', ')} this roll.`);
+      }
+      return out;
+    }
+
+    function convertIngredientsToGold(summary) {
+      if (!summary.ingredients.length) return;
+      const conv = state.statuses.find((s) => s.type === 'ingToGold' && s.expires === state.round);
+      if (!conv) return;
+      const per = conv.amount !== undefined ? conv.amount : 6;
+      const count = summary.ingredients.length;
+      const gain = per * count;
+      summary.ingredients = [];
+      if (gain > 0) {
+        gainGold(gain);
+        log(`Converted ${count} ingredient${count === 1 ? '' : 's'} into ${gain} Gold.`);
+      }
     }
 
     async function animateRollDisplay(finalRolls) {
@@ -1701,15 +2993,34 @@
 
     async function handleRoll() {
       if (state.rolled) return;
+      if (state.pendingDieSacrifice) { log('Select a die to sacrifice before rolling.'); return; }
+      if (state.pendingDieEmpower) { log('Select a die to empower before rolling.'); return; }
       const snapshot = {
         gold: state.gold,
         ingredients: [...state.ingredients],
-        statsIngredients: { ...state.stats.ingredients }
+        statsIngredients: { ...state.stats.ingredients },
+        score: state.stats.score
       };
-      const bonusDice = computeBonusDice();
+      const { generic: bonusDice, clones: bonusClones } = computeBonusDice();
+      const dupDice = duplicateDiceForRound();
       const baseDice = state.dice.slice(0, state.maxDice);
       const diceToRoll = [...baseDice];
-      const extra = Math.min(bonusDice, state.maxDice - diceToRoll.length);
+      dupDice.forEach((clone) => {
+        if (diceToRoll.length < state.maxDice) {
+          diceToRoll.push(clone);
+        } else {
+          log('Duplicate die could not be added (at max dice).');
+        }
+      });
+      bonusClones.forEach((clone) => {
+        if (diceToRoll.length < state.maxDice) {
+          diceToRoll.push(clone);
+        } else {
+          log('Bonus die copy could not be added (at max dice).');
+        }
+      });
+      const extraSlots = state.maxDice - diceToRoll.length;
+      const extra = Math.min(bonusDice, extraSlots);
       for (let i = 0; i < extra; i += 1) {
         diceToRoll.push({ id: `bonus-${i}`, typeId: 'apprentice' });
       }
@@ -1717,32 +3028,98 @@
       const totalDice = diceToRoll.length;
       const goldBefore = state.gold;
       const hasGoldDoubler = state.statuses.some((s) => s.type === 'goldDoubler' && s.expires === state.round);
+      const goldFaceBonus = goldFaceBonusForRoll();
       const rolls = [];
       const summary = { ingredients: [], goldFaces: [], effects: [] };
+
+      let convertedCoinTotal = 0;
+
+      const delayed = takeDelayedIngredientsForRound();
+      if (delayed.length) {
+        delayed.forEach((ing) => summary.ingredients.push(ing));
+        log(`Delayed ingredients granted: ${delayed.join(' + ')}.`);
+      }
+
+      const goldToIngActive = state.statuses.some((s) => s.type === 'goldToIngredient' && s.expires === state.round);
+      const doubleCoinIngActive = state.statuses.some((s) => s.type === 'doubleCoinIng' && s.expires === state.round);
 
       for (let i = 0; i < totalDice; i += 1) {
         const die = diceToRoll[i];
         const face = rollDie(die);
         rolls.push({ die, face });
-        if (face.kind === 'ingredient') summary.ingredients.push(face.ingredient);
-        if (face.kind === 'gold') { summary.goldFaces.push(face.gold); state.gold += face.gold; }
+        const mods = dieModifiers(die);
+        const dieGoldMult = mods.reduce((prod, m) => prod * (m.goldMult || 1), 1);
+        const dieIngMult = mods.reduce((prod, m) => prod * (m.ingMult || 1), 1);
+        if (face.kind === 'ingredient') {
+          const count = Math.max(1, Math.round((doubleCoinIngActive ? 2 : 1) * (dieIngMult || 1)));
+          for (let c = 0; c < count; c += 1) summary.ingredients.push(face.ingredient);
+        }
+        if (face.kind === 'gold') {
+          const totalGold = face.gold + goldFaceBonus;
+          const goldMult = state.statuses
+            .filter((s) => s.type === 'goldMultiplier' && s.expires === state.round)
+            .reduce((prod, s) => prod * (s.amount || 1), 1);
+          const finalGold = Math.round(totalGold * (goldMult || 1) * (dieGoldMult || 1));
+          const coinCount = doubleCoinIngActive ? finalGold * 2 : finalGold;
+          if (goldToIngActive) {
+            for (let g = 0; g < coinCount; g += 1) {
+              summary.ingredients.push(pick(ingredients));
+            }
+            convertedCoinTotal += coinCount;
+            summary.goldFaces.push(0);
+          } else {
+            summary.goldFaces.push(coinCount);
+            gainGold(coinCount);
+          }
+        }
         if (face.kind === 'effect') summary.effects.push(face.effect);
+      }
+
+      if (goldToIngActive) {
+        const convertedCoins = convertedCoinTotal;
+        const added = summary.ingredients.length - delayed.length - rolls.filter((r) => r.face.kind === 'ingredient').reduce((sum, r) => sum + (doubleCoinIngActive ? 2 : 1), 0);
+        if (added > 0) {
+          log(`Converted ${convertedCoins} coin${convertedCoins === 1 ? '' : 's'} into random ingredients.`);
+        }
       }
 
       const perDieBonus = state.statuses.filter((s) => s.type === 'perDieGold' && s.expires === state.round)
         .reduce((sum, s) => sum + s.amount, 0);
       if (perDieBonus) {
         const gain = perDieBonus * totalDice;
-        state.gold += gain;
+        gainGold(gain);
         log(`Boost: +${gain} Gold from per-die bonus.`);
       }
 
       applyEffects(rolls, summary);
+
+      summary.ingredients = convertIngredientsForRound(summary.ingredients);
+      convertIngredientsToGold(summary);
+
+      const addManaSafety = state.statuses.some((s) => s.type === 'passiveManaFloor');
+      if (addManaSafety && !summary.ingredients.includes('mana')) {
+        summary.ingredients.push('mana');
+        log('Passive: gained 1 Mana (none rolled).');
+      }
+
       summary.ingredients.forEach((ing) => recordIngredient(ing));
+
+      const floorTarget = passiveGoldFloorValue();
+      if (floorTarget) {
+        const floorEffect = state.statuses.find((s) => s.type === 'passiveGoldFloor');
+        const threshold = floorEffect && floorEffect.threshold !== undefined ? floorEffect.threshold : 3;
+        const gained = state.gold - goldBefore;
+        if (gained <= threshold && gained < floorTarget) {
+          const add = floorTarget - gained;
+          gainGold(add);
+          log(`Passive: raised Gold gain to ${floorTarget} (+${add}).`);
+        }
+      }
+      applyExcessGoldBonus(goldBefore);
       if (hasGoldDoubler) {
         const gained = state.gold - goldBefore;
         if (gained > 0) {
-          state.gold += gained;
+          gainGold(gained);
           log(`Gold Doubler: +${gained} extra Gold.`);
         }
       }
@@ -1751,6 +3128,13 @@
       state.rollSnapshot = snapshot;
       state.pendingDieReroll = false;
       state.rolled = true;
+      const dieReroll = state.statuses.find((s) => s.type === 'dieRerollToken' && s.expires === state.round);
+      if (dieReroll) {
+        state.pendingDieReroll = true;
+        state.dieRerollsLeft = (state.dieRerollsLeft || 0) + (dieReroll.amount || 1);
+        state.statuses = state.statuses.filter((s) => s !== dieReroll);
+        log(`Die reroll ready: click a die to reroll (left: ${state.dieRerollsLeft}).`);
+      }
       renderDice(rolls);
       render();
       els.rollBtn.disabled = true;
@@ -1758,20 +3142,81 @@
       log('Click Go To Store to shop, then Start Next Round there.');
     }
 
+    function applyCharacterToState() {
+      if (!characterClasses.length) return;
+      const choice = characterClasses.find((c) => c.id === selectedCharacterId) || characterClasses[0];
+      state.character = choice.id;
+      state.statuses.push({ type: 'character', name: choice.name });
+      choice.apply(state);
+      log(`Starting as ${choice.name}.`);
+    }
+
     function startGame() {
       state = freshState();
       els.log.innerHTML = '';
+      ensureToggleDefaults();
+      applyCharacterToState();
       refreshShopOffers();
       renderDice([]);
       render();
       startRound();
     }
 
+    function toggleHowTo() {
+      if (!els.howToPlay || !els.startHowToBtn) return;
+      const isHidden = els.howToPlay.classList.contains('hidden');
+      els.howToPlay.classList.toggle('hidden');
+      els.startHowToBtn.textContent = isHidden ? 'Hide How to Play' : 'How to Play';
+    }
+
+    function renderToggleList(container, entries, enabledMap) {
+      if (!container) return;
+      container.innerHTML = '';
+      entries.forEach(({ id, label }) => {
+        const row = document.createElement('label');
+        row.className = 'list-item';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.innerHTML = `<div><strong>${label}</strong></div>`;
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = enabledMap[id] !== false;
+        cb.dataset.toggleId = id;
+        row.appendChild(cb);
+        container.appendChild(row);
+      });
+    }
+
+    function collectToggleValues(container, fallbackIds) {
+      const map = {};
+      if (!container) {
+        fallbackIds.forEach((id) => { map[id] = true; });
+        return map;
+      }
+      container.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+        map[cb.dataset.toggleId] = cb.checked;
+      });
+      return map;
+    }
+
     function populateSettingsForm() {
+      ensureToggleDefaults();
       els.settingStartingDice.value = settings.startingDice;
       els.settingStartingGold.value = settings.startingGold;
       els.settingMaxRounds.value = settings.maxRounds;
       els.settingShopSlots.value = settings.shopItemSlots;
+      renderToggleList(els.settingItemToggles, itemIds.map((id) => ({ id, label: id })), settings.enabledItems);
+      renderToggleList(els.settingDieToggles, dieTypeIds.map((id) => ({ id, label: id })), settings.enabledDiceTypes);
+      const faceEntries = faceKeys.map((k) => {
+        if (k.startsWith('eff_doubleIng_')) {
+          const ing = k.replace('eff_doubleIng_', '');
+          return { id: k, label: `Double ${ing}` };
+        }
+        if (k === 'eff_doubleGoldAll') return { id: k, label: 'Double all Gold' };
+        return { id: k, label: k.replace('ing_', '').replace('eff_', '') };
+      });
+      renderToggleList(els.settingFaceToggles, faceEntries, settings.enabledFaces);
     }
 
     function openSettings() {
@@ -1794,7 +3239,10 @@
         startingDice: readNumber(els.settingStartingDice, defaultSettings.startingDice, 1, 9),
         startingGold: Math.max(0, readNumber(els.settingStartingGold, defaultSettings.startingGold, 0, 999)),
         maxRounds: readNumber(els.settingMaxRounds, defaultSettings.maxRounds, 1, 99),
-        shopItemSlots: readNumber(els.settingShopSlots, defaultSettings.shopItemSlots, 1, 6)
+        shopItemSlots: readNumber(els.settingShopSlots, defaultSettings.shopItemSlots, 1, 6),
+        enabledItems: collectToggleValues(els.settingItemToggles, itemIds),
+        enabledDiceTypes: collectToggleValues(els.settingDieToggles, dieTypeIds),
+        enabledFaces: collectToggleValues(els.settingFaceToggles, faceKeys)
       };
       closeSettingsModal();
       log('Settings saved. New games will use these values.');
@@ -1804,6 +3252,7 @@
 
     function resetSettings() {
       settings = { ...defaultSettings };
+      ensureToggleDefaults();
       populateSettingsForm();
       log('Settings reset to defaults.');
       refreshShopOffers();
@@ -1812,44 +3261,63 @@
 
     function sellAllPotions() {
       if (!state.potions.length) return;
+      const bonus = potionSellBonusForRound();
       let sum = 0;
-      state.potions.forEach((p) => { sum += p.sell; });
-      state.gold += sum;
-      log(`Sold all potions for ${sum} Gold.`);
+      state.potions.forEach((p) => { sum += p.sell + bonus; });
+      gainGold(sum);
+      log(`Sold all potions for ${sum} Gold${bonus ? ` (includes +${bonus} per potion)` : ''}.`);
       state.potions = [];
       render();
     }
 
     // Events
     els.rollBtn.addEventListener('click', handleRoll);
-    els.sellAll.addEventListener('click', sellAllPotions);
+    if (els.sellAllShop) els.sellAllShop.addEventListener('click', sellAllPotions);
     els.openRecipeBook.addEventListener('click', openRecipe);
     els.closeRecipeBook.addEventListener('click', closeRecipe);
     els.closeInvalidBrew.addEventListener('click', hideInvalidBrew);
     els.invalidBrewModal.addEventListener('click', (e) => {
       if (e.target === els.invalidBrewModal) hideInvalidBrew();
     });
-    els.startGameBtn.addEventListener('click', startGame);
+    els.startGameBtn.addEventListener('click', () => {
+      setView('character');
+      renderCharacterSelect();
+      log('Choose your brewer, then start.');
+    });
+    if (els.chooseCharacterBtn) {
+      els.chooseCharacterBtn.addEventListener('click', () => {
+        startGame();
+      });
+    }
     els.startRecipeBtn.addEventListener('click', openRecipe);
     els.startStatsBtn.addEventListener('click', () => openStatsModal(lastRunStats || state.stats, true));
     els.startSettingsBtn.addEventListener('click', openSettings);
+    if (els.startHowToBtn) els.startHowToBtn.addEventListener('click', toggleHowTo);
     els.toShopBtn.addEventListener('click', () => { setView('shop'); render(); });
     els.backToBrew.addEventListener('click', finishRound);
     els.brewBtn.addEventListener('click', brewCauldron);
     els.autoBrewBtn.addEventListener('click', autoBrew);
     els.clearCauldron.addEventListener('click', clearCauldronContents);
     els.rerollShop.addEventListener('click', () => {
+      if (typeof state.shopRerollsLeft !== 'number') state.shopRerollsLeft = 3;
+      if (state.shopRerollsLeft <= 0) {
+        log('No shop rerolls left this run (max 3).');
+        return;
+      }
       if (state.tokens.reroll > 0) {
         state.tokens.reroll -= 1;
+        state.shopRerollsLeft -= 1;
         refreshShopOffers();
-        log('Rerolled entire shop using a token.');
+        log(`Rerolled entire shop using a token. (${state.shopRerollsLeft} left)`);
         render();
         return;
       }
-      if (state.gold < 3) { log('Need 3 Gold or a token to reroll shop.'); return; }
-      state.gold -= 3;
+      const cost = shopRerollCost();
+      if (state.gold < cost) { log(`Need ${cost} Gold or a token to reroll shop.`); return; }
+      state.gold -= cost;
+      state.shopRerollsLeft -= 1;
       refreshShopOffers();
-      log('Rerolled entire shop for 3 Gold.');
+      log(`Rerolled entire shop for ${cost} Gold. (${state.shopRerollsLeft} left)`);
       render();
     });
     els.closeSettings.addEventListener('click', closeSettingsModal);
@@ -1874,9 +3342,11 @@
     });
 
     // Init
+    renderCharacterSelect();
+    refreshShopOffers();
     renderDice([]);
     render();
     setView('start');
   </script>
 </body>
-</html>
+  </html>
